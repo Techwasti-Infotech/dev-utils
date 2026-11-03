@@ -1,0 +1,95 @@
+{
+  "name": "dev-utils",
+  "version": "1.0.0",
+  "description": "Cross-Platform, 100% Offline, Privacy-First Developer and QA Desktop Utilities",
+  "main": "dist/main/main.js",
+  "author": {
+    "name": "Techwasti Open Source Community",
+    "url": "https://github.com/techwasti/dev-utils"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/techwasti/dev-utils.git"
+  },
+  "keywords": [
+    "developer-tools",
+    "qa-tools",
+    "electron",
+    "typescript",
+    "offline-first",
+    "privacy-compliant",
+    "cross-platform",
+    "jwt-decoder",
+    "json-formatter",
+    "regex-tester"
+  ],
+  "scripts": {
+    "build:ts": "tsc",
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "node -e \"const fs=require('fs'); fs.mkdirSync('dist/renderer', {recursive:true}); fs.copyFileSync('src/renderer/index.html','dist/renderer/index.html'); fs.copyFileSync('src/renderer/styles.css','dist/renderer/styles.css'); fs.copyFileSync('src/renderer/renderer.js','dist/renderer/renderer.js');\"",
+    "start": "npm run build && electron .",
+    "test": "jest --config jest.config.js --runInBand",
+    "test:coverage": "jest --config jest.config.js --coverage",
+    "lint": "eslint src --ext .ts",
+    "pack": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.techwasti.devutils",
+    "productName": "DevUtils Desktop",
+    "copyright": "Copyright © 2026 Techwasti",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "artifactName": "${productName}-${version}-mac.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "category": "Development",
+      "artifactName": "${productName}-${version}-linux.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.24",
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.3.3"
+  }
+}
+

@@ -1,0 +1,72 @@
+name: Bug report
+description: Create a report to help us improve DevUtils
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: os
+    attributes:
+      label: Operating System & Version
+      description: What OS are you running? (e.g. Windows 11, macOS Sonoma 14.2, Ubuntu 22.04 LTS)
+      placeholder: Windows 11 / macOS / Ubuntu
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: DevUtils Version
+      description: Version of DevUtils you are using (e.g. v1.0.0 or built from commit SHA)
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: utility-affected
+    attributes:
+      label: Affected Utility
+      options:
+        - JSON Formatter & Minifier
+        - JWT Inspector
+        - JSON / CSV Converter
+        - Base64 / URL / HTML Codec
+        - Cryptographic Hashes & HMAC
+        - Regex Tester
+        - Text Diff Viewer
+        - UUID & Mock QA Data Generator
+        - cURL to Code Converter
+        - Unix Timestamp / Epoch
+        - String Cases & Stats
+        - Cron Expression Explainer
+        - General Desktop UI / Packaging
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Steps to Reproduate
+      description: Describe the steps required to trigger the issue.
+      placeholder: |
+        1. Open 'JWT Inspector'
+        2. Paste token: ...
+        3. Click 'Decode Token'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What happened instead? (Include error messages or screenshots if applicable)
+    validations:
+      required: true
+

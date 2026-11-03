@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevUtils - 100% Offline Developer & QA Utilities</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">⚡</span>
+        <div class="brand-text">
+          <h2>DevUtils</h2>
+          <span class="badge-offline">100% Offline & Private</span>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="tool-search" placeholder="Search 18 utilities (Ctrl+K)...">
+      </div>
+
+      <nav class="nav-menu" id="nav-menu">
+        <div class="nav-section-label">DATA & FORMATTING</div>
+        <button class="nav-item active" data-tab="json-tab">
+          <span class="icon">{}</span> JSON Formatter & Minifier
+        </button>
+        <button class="nav-item" data-tab="jwt-tab">
+          <span class="icon">🔑</span> JWT Inspector
+        </button>
+        <button class="nav-item" data-tab="converter-tab">
+          <span class="icon">⇄</span> JSON ↔ CSV Converter
+        </button>
+        <button class="nav-item" data-tab="xml-tab">
+          <span class="icon">&lt;&gt;</span> XML Prettifier & Validator
+        </button>
+        <button class="nav-item" data-tab="sql-tab">
+          <span class="icon">🗄️</span> SQL Query Beautifier
+        </button>
+
+        <div class="nav-section-label">SECURITY & ENCODING</div>
+        <button class="nav-item" data-tab="codec-tab">
+          <span class="icon">🔡</span> Base64 / URL / HTML
+        </button>
+        <button class="nav-item" data-tab="hex-tab">
+          <span class="icon">0x</span> Hex ↔ Text Converter
+        </button>
+        <button class="nav-item" data-tab="hash-tab">
+          <span class="icon">#️⃣</span> Hash & HMAC Generator
+        </button>
+        <button class="nav-item" data-tab="password-tab">
+          <span class="icon">🔒</span> Secure Password Generator
+        </button>
+
+        <div class="nav-section-label">TESTING & QA UTILITIES</div>
+        <button class="nav-item" data-tab="regex-tab">
+          <span class="icon">.*</span> Regex Tester & Debugger
+        </button>
+        <button class="nav-item" data-tab="diff-tab">
+          <span class="icon">±</span> Text Diff & Comparison
+        </button>
+        <button class="nav-item" data-tab="generator-tab">
+          <span class="icon">🎲</span> UUID & Mock QA Data
+        </button>
+        <button class="nav-item" data-tab="http-tab">
+          <span class="icon">📡</span> HTTP Status & Headers Lookup
+        </button>
+
+        <div class="nav-section-label">NETWORK & API TOOLS</div>
+        <button class="nav-item" data-tab="curl-tab">
+          <span class="icon">🌐</span> cURL to Code Converter
+        </button>
+        <button class="nav-item" data-tab="subnet-tab">
+          <span class="icon">📶</span> CIDR / Subnet Calculator
+        </button>
+
+        <div class="nav-section-label">TIME & TEXT</div>
+        <button class="nav-item" data-tab="timestamp-tab">
+          <span class="icon">⏱️</span> Unix Timestamp / Epoch
+        </button>
+        <button class="nav-item" data-tab="text-tab">
+          <span class="icon">Aa</span> String Case & Inspector
+        </button>
+        <button class="nav-item" data-tab="cron-tab">
+          <span class="icon">⏲️</span> Cron Expression Explainer
+        </button>
+      </nav>
+
+      <footer class="sidebar-footer">
+        <p>Zero telemetry. Never transmits data.</p>
+        <a href="https://github.com/techwasti/dev-utils" target="_blank">Open Source (MIT)</a>
+      </footer>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="header-titles">
+          <h1 id="active-tool-title">JSON Formatter & Minifier</h1>
+          <p id="active-tool-desc">Format, minify, and validate JSON payloads instantly.</p>
+        </div>
+        <div class="top-bar-actions">
+          <span class="compliance-tag">🛡️ Air-Gapped Safe</span>
+        </div>
+      </header>
+
+      <div class="tab-content-area">
+        <!-- 1. JSON Tab -->
+        <section id="json-tab" class="tab-pane active">
+          <div class="toolbar">
+            <button id="json-format-btn" class="btn btn-primary">Prettify (2 spaces)</button>
+            <button id="json-format-4-btn" class="btn btn-secondary">Prettify (4 spaces)</button>
+            <button id="json-minify-btn" class="btn btn-secondary">Minify</button>
+            <button id="json-clear-btn" class="btn btn-ghost">Clear</button>
+            <button id="json-copy-btn" class="btn btn-ghost">Copy Output</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Input JSON</label>
+              <textarea id="json-input" placeholder='Paste your JSON string here...'></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Output / Validation</label>
+              <textarea id="json-output" readonly placeholder='Formatted output will appear here...'></textarea>
+            </div>
+          </div>
+          <div id="json-status" class="status-bar"></div>
+        </section>
+
+        <!-- 2. JWT Tab -->
+        <section id="jwt-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="jwt-decode-btn" class="btn btn-primary">Decode Token</button>
+            <button id="jwt-clear-btn" class="btn btn-ghost">Clear</button>
+          </div>
+          <div class="input-block">
+            <label>Encoded JWT Token</label>
+            <textarea id="jwt-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE5OTk5OTk5OTl9..."></textarea>
+          </div>
+          <div id="jwt-claims-banner" class="claims-banner"></div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Decoded Header</label>
+              <textarea id="jwt-header-output" readonly></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Decoded Payload (Claims)</label>
+              <textarea id="jwt-payload-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Converter Tab -->
+        <section id="converter-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="json-to-csv-btn" class="btn btn-primary">JSON ➔ CSV</button>
+            <button id="csv-to-json-btn" class="btn btn-primary">CSV ➔ JSON</button>
+            <button id="conv-clear-btn" class="btn btn-ghost">Clear</button>
+            <button id="conv-copy-btn" class="btn btn-ghost">Copy Output</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Input (JSON Array or CSV Table)</label>
+              <textarea id="conv-input" placeholder='[{"id": 1, "name": "QA Tester"}, {"id": 2, "name": "Developer"}]'></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Converted Output</label>
+              <textarea id="conv-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. XML Tab (New) -->
+        <section id="xml-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="xml-format-btn" class="btn btn-primary">Prettify XML</button>
+            <button id="xml-clear-btn" class="btn btn-ghost">Clear</button>
+            <button id="xml-copy-btn" class="btn btn-ghost">Copy Output</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Input XML</label>
+              <textarea id="xml-input" placeholder="<root><user id='1'><name>Alice</name></user></root>"></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Formatted XML</label>
+              <textarea id="xml-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. SQL Tab (New) -->
+        <section id="sql-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="sql-format-btn" class="btn btn-primary">Beautify SQL</button>
+            <button id="sql-clear-btn" class="btn btn-ghost">Clear</button>
+            <button id="sql-copy-btn" class="btn btn-ghost">Copy Output</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Raw SQL Query</label>
+              <textarea id="sql-input" placeholder="select u.id, u.name from users u where u.status = 'active' and u.role = 'developer' group by u.id order by u.name"></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Formatted SQL</label>
+              <textarea id="sql-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. Codec Tab -->
+        <section id="codec-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="b64-encode-btn" class="btn btn-primary">Base64 Encode</button>
+            <button id="b64-decode-btn" class="btn btn-secondary">Base64 Decode</button>
+            <button id="url-encode-btn" class="btn btn-primary">URL Encode</button>
+            <button id="url-decode-btn" class="btn btn-secondary">URL Decode</button>
+            <button id="html-escape-btn" class="btn btn-primary">HTML Escape</button>
+            <button id="html-unescape-btn" class="btn btn-secondary">HTML Unescape</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Raw Input</label>
+              <textarea id="codec-input" placeholder="Enter text to encode or decode..."></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Result</label>
+              <textarea id="codec-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. Hex Tab (New) -->
+        <section id="hex-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="text-to-hex-btn" class="btn btn-primary">Text ➔ Hex</button>
+            <button id="hex-to-text-btn" class="btn btn-primary">Hex ➔ Text</button>
+            <button id="hex-clear-btn" class="btn btn-ghost">Clear</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Input (Text string or Hex bytes)</label>
+              <textarea id="hex-input" placeholder="Enter text or hex (e.g. 48 65 6c 6c 6f)..."></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Output</label>
+              <textarea id="hex-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. Hash Tab -->
+        <section id="hash-tab" class="tab-pane">
+          <div class="toolbar">
+            <input type="text" id="hmac-key" class="input-inline" placeholder="Optional HMAC Secret Key">
+            <button id="hash-generate-btn" class="btn btn-primary">Generate Hashes</button>
+          </div>
+          <div class="input-block">
+            <label>Input Text</label>
+            <textarea id="hash-input" rows="3" placeholder="Enter string to calculate cryptographic digests..."></textarea>
+          </div>
+          <div class="hash-results-list" id="hash-results">
+            <div class="hash-row"><span>MD5:</span><input type="text" readonly id="hash-md5"></div>
+            <div class="hash-row"><span>SHA-1:</span><input type="text" readonly id="hash-sha1"></div>
+            <div class="hash-row"><span>SHA-256:</span><input type="text" readonly id="hash-sha256"></div>
+            <div class="hash-row"><span>SHA-512:</span><input type="text" readonly id="hash-sha512"></div>
+            <div class="hash-row"><span>HMAC SHA-256:</span><input type="text" readonly id="hash-hmac256"></div>
+          </div>
+        </section>
+
+        <!-- 9. Password Tab (New) -->
+        <section id="password-tab" class="tab-pane">
+          <div class="toolbar">
+            <label>Length:</label>
+            <input type="number" id="pwd-len" value="20" min="8" max="128" class="input-small">
+            <label><input type="checkbox" id="pwd-upper" checked> Uppercase</label>
+            <label><input type="checkbox" id="pwd-lower" checked> Lowercase</label>
+            <label><input type="checkbox" id="pwd-nums" checked> Numbers</label>
+            <label><input type="checkbox" id="pwd-syms" checked> Symbols</label>
+            <button id="pwd-generate-btn" class="btn btn-primary">Generate Secure Password</button>
+          </div>
+          <div class="results-card">
+            <h3>Generated Password / Secret</h3>
+            <div class="hash-row">
+              <input type="text" id="pwd-output" readonly style="font-size: 16px; font-weight: bold; color: var(--accent-color);">
+              <button id="pwd-copy-btn" class="btn btn-secondary">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 10. Regex Tab -->
+        <section id="regex-tab" class="tab-pane">
+          <div class="toolbar regex-toolbar">
+            <input type="text" id="regex-pattern" placeholder="Regular expression pattern e.g. [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}">
+            <input type="text" id="regex-flags" placeholder="Flags (i, m, s)" value="i">
+            <button id="regex-run-btn" class="btn btn-primary">Test Regex</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Test Text</label>
+              <textarea id="regex-text" placeholder="Paste test strings or log file contents here..."></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Match Results (<span id="regex-match-count">0 matches</span>)</label>
+              <div id="regex-matches-container" class="output-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11. Diff Tab -->
+        <section id="diff-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="diff-run-btn" class="btn btn-primary">Compare Differences</button>
+            <button id="diff-clear-btn" class="btn btn-ghost">Clear</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Original Text</label>
+              <textarea id="diff-orig" placeholder="Original content or old file version..."></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Modified Text</label>
+              <textarea id="diff-mod" placeholder="New content or updated file version..."></textarea>
+            </div>
+          </div>
+          <div class="diff-viewer-container">
+            <label>Unified Diff View</label>
+            <div id="diff-output" class="diff-output-box"></div>
+          </div>
+        </section>
+
+        <!-- 12. Generator Tab -->
+        <section id="generator-tab" class="tab-pane">
+          <div class="toolbar">
+            <label>Count:</label>
+            <input type="number" id="gen-count" value="5" min="1" max="100" class="input-small">
+            <label><input type="checkbox" id="gen-upper"> Uppercase</label>
+            <label><input type="checkbox" id="gen-nohyphen"> No Hyphens</label>
+            <button id="gen-uuid-btn" class="btn btn-primary">Generate UUIDs</button>
+            <button id="gen-users-btn" class="btn btn-secondary">Generate QA Mock Users (JSON)</button>
+          </div>
+          <div class="editor-pane full-width">
+            <label>Generated Data</label>
+            <textarea id="gen-output" readonly rows="12"></textarea>
+          </div>
+        </section>
+
+        <!-- 13. HTTP Status Lookup Tab (New) -->
+        <section id="http-tab" class="tab-pane">
+          <div class="toolbar">
+            <input type="number" id="http-code-input" value="404" placeholder="Enter status code e.g. 200, 401, 503..." class="input-inline">
+            <button id="http-lookup-btn" class="btn btn-primary">Lookup HTTP Status</button>
+          </div>
+          <div class="results-card">
+            <div class="hash-row"><span>Status Code:</span><input type="text" readonly id="http-res-code"></div>
+            <div class="hash-row"><span>Phrase:</span><input type="text" readonly id="http-res-phrase"></div>
+            <div class="hash-row"><span>Category:</span><input type="text" readonly id="http-res-cat"></div>
+            <div class="hash-row"><span>Meaning / Guidance:</span><input type="text" readonly id="http-res-desc"></div>
+          </div>
+        </section>
+
+        <!-- 14. Curl Tab -->
+        <section id="curl-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="curl-parse-btn" class="btn btn-primary">Parse & Generate Code</button>
+            <button id="curl-clear-btn" class="btn btn-ghost">Clear</button>
+          </div>
+          <div class="input-block">
+            <label>Raw cURL Command</label>
+            <textarea id="curl-input" rows="3" placeholder='curl -X POST https://api.example.com/login -H "Content-Type: application/json" -d "{\"user\":\"admin\"}"'></textarea>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>JavaScript (fetch API)</label>
+              <textarea id="curl-js-output" readonly></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Python (requests)</label>
+              <textarea id="curl-py-output" readonly></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 15. Subnet Calculator Tab (New) -->
+        <section id="subnet-tab" class="tab-pane">
+          <div class="toolbar">
+            <input type="text" id="subnet-cidr-input" value="192.168.1.0/24" placeholder="CIDR block e.g. 10.0.0.0/16 or 172.16.0.0/24" class="input-inline">
+            <button id="subnet-calc-btn" class="btn btn-primary">Calculate Subnet</button>
+          </div>
+          <div class="results-card">
+            <div class="hash-row"><span>Netmask:</span><input type="text" readonly id="sub-mask"></div>
+            <div class="hash-row"><span>Network Address:</span><input type="text" readonly id="sub-net"></div>
+            <div class="hash-row"><span>Broadcast Address:</span><input type="text" readonly id="sub-bcast"></div>
+            <div class="hash-row"><span>First Usable Host IP:</span><input type="text" readonly id="sub-first"></div>
+            <div class="hash-row"><span>Last Usable Host IP:</span><input type="text" readonly id="sub-last"></div>
+            <div class="hash-row"><span>Usable Host Count:</span><input type="text" readonly id="sub-hosts"></div>
+          </div>
+        </section>
+
+        <!-- 16. Timestamp Tab -->
+        <section id="timestamp-tab" class="tab-pane">
+          <div class="toolbar">
+            <input type="text" id="time-input" placeholder="Epoch timestamp (1700000000) or ISO date (2026-11-01)...">
+            <button id="time-convert-btn" class="btn btn-primary">Convert Date/Time</button>
+            <button id="time-now-btn" class="btn btn-secondary">Current Timestamp</button>
+          </div>
+          <div class="results-card" id="time-results">
+            <div class="hash-row"><span>ISO 8601 (UTC):</span><input type="text" readonly id="time-iso"></div>
+            <div class="hash-row"><span>UTC String:</span><input type="text" readonly id="time-utc"></div>
+            <div class="hash-row"><span>Local Time:</span><input type="text" readonly id="time-local"></div>
+            <div class="hash-row"><span>Epoch Seconds:</span><input type="text" readonly id="time-sec"></div>
+            <div class="hash-row"><span>Epoch Milliseconds:</span><input type="text" readonly id="time-ms"></div>
+          </div>
+        </section>
+
+        <!-- 17. String Cases & Stats -->
+        <section id="text-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="text-inspect-btn" class="btn btn-primary">Inspect & Convert Cases</button>
+          </div>
+          <div class="input-block">
+            <label>Input Text</label>
+            <textarea id="text-input" rows="3" placeholder="Enter text to convert to camelCase, snake_case, etc..."></textarea>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Case Transformations</label>
+              <div class="hash-results-list" id="case-results">
+                <div class="hash-row"><span>camelCase:</span><input type="text" readonly id="case-camel"></div>
+                <div class="hash-row"><span>PascalCase:</span><input type="text" readonly id="case-pascal"></div>
+                <div class="hash-row"><span>snake_case:</span><input type="text" readonly id="case-snake"></div>
+                <div class="hash-row"><span>kebab-case:</span><input type="text" readonly id="case-kebab"></div>
+                <div class="hash-row"><span>CONSTANT_CASE:</span><input type="text" readonly id="case-constant"></div>
+              </div>
+            </div>
+            <div class="editor-pane">
+              <label>Text Analysis</label>
+              <div class="hash-results-list" id="stats-results">
+                <div class="hash-row"><span>Characters:</span><input type="text" readonly id="stat-chars"></div>
+                <div class="hash-row"><span>Characters (no spaces):</span><input type="text" readonly id="stat-chars-ns"></div>
+                <div class="hash-row"><span>Word Count:</span><input type="text" readonly id="stat-words"></div>
+                <div class="hash-row"><span>Line Count:</span><input type="text" readonly id="stat-lines"></div>
+                <div class="hash-row"><span>Size (UTF-8 Bytes):</span><input type="text" readonly id="stat-bytes"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 18. Cron Tab -->
+        <section id="cron-tab" class="tab-pane">
+          <div class="toolbar">
+            <input type="text" id="cron-input" value="*/15 9-18 * * 1-5" placeholder="e.g. */15 * * * *">
+            <button id="cron-explain-btn" class="btn btn-primary">Explain Cron Schedule</button>
+          </div>
+          <div class="results-card">
+            <h3>Human-Readable Meaning</h3>
+            <p id="cron-description" class="cron-desc-box">Press "Explain Cron Schedule" to decode.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

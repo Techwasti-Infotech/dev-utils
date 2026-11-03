@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevUtils - 100% Offline Developer & QA Utilities Desktop Application</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card-bg: #181b24;
+      --accent: #38bdf8;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: #2e3446;
+      --success: #4ade80;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding: 0 20px; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 0; }
+    header { text-align: center; margin-bottom: 50px; }
+    h1 { font-size: 2.8rem; color: #fff; margin-bottom: 12px; }
+    .subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 24px; }
+    .badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
+    .badge { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; color: var(--accent); }
+    .cta-buttons { display: flex; justify-content: center; gap: 16px; margin-top: 20px; }
+    .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: 0.2s; }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #0284c7; color: #fff; }
+    .btn-secondary { background: var(--card-bg); color: #fff; border: 1px solid var(--border); }
+    .section-title { font-size: 1.8rem; margin: 50px 0 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: #fff; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; }
+    .card h3 { color: var(--accent); margin-bottom: 10px; font-size: 1.2rem; }
+    .card p { color: var(--text-muted); font-size: 0.95rem; }
+    .privacy-box { background: rgba(74, 222, 128, 0.08); border: 1px solid var(--success); padding: 24px; border-radius: 10px; margin: 30px 0; }
+    .privacy-box h3 { color: var(--success); margin-bottom: 10px; }
+    pre { background: #000; padding: 16px; border-radius: 8px; overflow-x: auto; color: #38bdf8; margin: 15px 0; font-size: 0.9rem; }
+    footer { text-align: center; margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ DevUtils Desktop</h1>
+      <p class="subtitle">The complete offline developer & QA toolbox. Fast, private, open-source, and guaranteed air-gapped.</p>
+      <div class="badges">
+        <span class="badge">🛡️ 100% Offline Safe</span>
+        <span class="badge">💻 Windows • macOS • Linux</span>
+        <span class="badge">📜 MIT Licensed</span>
+        <span class="badge">🧪 18 Tested Utilities</span>
+      </div>
+      <div class="cta-buttons">
+        <a href="https://github.com/techwasti/dev-utils/releases" class="btn btn-primary">Download Executables</a>
+        <a href="https://github.com/techwasti/dev-utils" class="btn btn-secondary">View on GitHub</a>
+      </div>
+    </header>
+
+    <div class="privacy-box">
+      <h3>🔒 Air-Gapped & Zero Data Leakage Guarantee</h3>
+      <p>
+        Online formatters, JWT decoders, and regex testers can expose production tokens, PII, passwords, and proprietary API payloads to remote 3rd party web servers.
+        <strong>DevUtils runs 100% locally on your desktop</strong> with sandboxed rendering and no outbound network calls.
+      </p>
+    </div>
+
+    <h2 class="section-title">Built-in Utilities for Developers & QA (18 Tools)</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>{} JSON Formatter & Minifier</h3>
+        <p>Prettify, minify, and validate JSON payloads with 2-space or 4-space indentations.</p>
+      </div>
+      <div class="card">
+        <h3>🔑 JWT Token Inspector</h3>
+        <p>Inspect header, payload claims, expiration timestamps, and validity countdown completely offline.</p>
+      </div>
+      <div class="card">
+        <h3>⇄ JSON ↔ CSV Converter</h3>
+        <p>Bi-directional data converter between JSON arrays and CSV spreadsheets.</p>
+      </div>
+      <div class="card">
+        <h3>&lt;&gt; XML Prettifier & Validator</h3>
+        <p>Indent and inspect nested XML documents with syntax checking.</p>
+      </div>
+      <div class="card">
+        <h3>🗄️ SQL Query Beautifier</h3>
+        <p>Standardize SQL keyword capitalization and clause formatting for database queries.</p>
+      </div>
+      <div class="card">
+        <h3>0x Hex ↔ Text Converter</h3>
+        <p>Convert raw UTF-8 text strings to hex bytes and decode hex dumps back to readable text.</p>
+      </div>
+      <div class="card">
+        <h3>🔒 Secure Password Generator</h3>
+        <p>Generate cryptographically strong passwords and secrets with custom symbol and length criteria.</p>
+      </div>
+      <div class="card">
+        <h3>🔡 Base64, URL & HTML Codec</h3>
+        <p>Safe encoders and decoders for UTF-8 Base64, URL query parameters, and HTML entities.</p>
+      </div>
+      <div class="card">
+        <h3>#️⃣ Cryptographic Hashes & HMAC</h3>
+        <p>Instant checksum digests: MD5, SHA-1, SHA-256, SHA-512, and secret-keyed HMAC calculations.</p>
+      </div>
+      <div class="card">
+        <h3>.* Regex Tester & Matcher</h3>
+        <p>Test patterns against logs and sample payloads with capture group breakdowns.</p>
+      </div>
+      <div class="card">
+        <h3>± Side-by-Side Text Diff</h3>
+        <p>Quick comparison between expected vs actual API responses and configurations.</p>
+      </div>
+      <div class="card">
+        <h3>🎲 UUID & Mock User Generator</h3>
+        <p>Produce batch UUID v4/v1 IDs and mock user test profiles (email, roles, status) for QA pipelines.</p>
+      </div>
+      <div class="card">
+        <h3>📡 HTTP Status Code & Header Lookup</h3>
+        <p>Quick offline reference for 1xx, 2xx, 3xx, 4xx, 5xx status codes and semantic meanings.</p>
+      </div>
+      <div class="card">
+        <h3>📶 CIDR / IPv4 Subnet Calculator</h3>
+        <p>Calculate network addresses, broadcast IPs, subnet masks, and usable host count for IP blocks.</p>
+      </div>
+      <div class="card">
+        <h3>🌐 cURL to Code Generator</h3>
+        <p>Translate cURL command strings into ready-to-use JavaScript <code>fetch</code> and Python <code>requests</code> snippets.</p>
+      </div>
+      <div class="card">
+        <h3>⏱️ Unix Epoch & Timestamp</h3>
+        <p>Convert back and forth between unix timestamps (seconds & milliseconds) and UTC / Local times.</p>
+      </div>
+      <div class="card">
+        <h3>Aa String Case Converter</h3>
+        <p>camelCase, snake_case, kebab-case, CONSTANT_CASE, plus word count, character count, and UTF-8 byte sizes.</p>
+      </div>
+      <div class="card">
+        <h3>⏲️ Cron Schedule Explainer</h3>
+        <p>Translate cron expressions into human-readable plain language schedules.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">Quick Start: Build from Source</h2>
+    <p>To run or compile locally on Windows, macOS, or Linux:</p>
+    <pre><code># 1. Clone the repository
+git clone https://github.com/techwasti/dev-utils.git
+cd dev-utils
+
+# 2. Install dependencies
+npm install
+
+# 3. Run unit tests
+npm test
+
+# 4. Start the desktop application
+npm start
+
+# 5. Build native installer for your OS
+npm run dist</code></pre>
+
+    <footer>
+      <p>DevUtils is maintained by the Techwasti open source community under the MIT License.</p>
+    </footer>
+  </div>
+</body>
+</html>

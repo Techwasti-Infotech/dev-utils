@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest an idea or new utility for DevUtils
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We are eager to add new utilities that simplify the day-to-day workflow of developers and QA engineers!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is.
+      placeholder: "I'm always frustrated when I need to..."
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear description of the new utility or enhancement you are proposing.
+    validations:
+      required: true
+  - type: checkboxes
+    id: offline-compliance
+    attributes:
+      label: Offline & Security Compliance Check
+      description: DevUtils strictly enforces a zero-telemetry, zero-network rule.
+      options:
+        - label: I confirm this requested utility can run 100% offline without querying external internet endpoints.
+          required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe alternatives you've considered
+      description: Any alternative solutions or features you've considered.
+
