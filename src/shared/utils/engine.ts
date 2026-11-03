@@ -794,3 +794,185 @@ export function lookupHttpStatusCode(code: number): HttpStatusDetail | null {
     category: item.category
   };
 }
+
+// =========================================================================
+// 19. Markdown to HTML Converter (Offline)
+// =========================================================================
+export function markdownToHtml(md: string): string {
+  let html = md
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    .replace(/`([^`]+)`/gim, '<code>$1</code>')
+    .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank">$1</a>');
+
+  // Handle unordered list items
+  html = html.replace(/^\s*-\s+(.*$)/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>');
+
+  // Paragraphs
+  const paras = html.split(/\n{2,}/);
+  return paras
+    .map(p => {
+      p = p.trim();
+      if (!p) return '';
+      if (/^<(h[1-6]|ul|li|blockquote|pre)/i.test(p)) return p;
+      return `<p>${p.replace(/\n/g, '<br/>')}</p>`;
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+// =========================================================================
+// 20. Color Palette & Format Converter (HEX, RGB, HSL)
+// =========================================================================
+export interface ColorInfo {
+  hex: string;
+  rgb: string;
+  rgba: string;
+  hsl: string;
+  r: number;
+  g: number;
+  b: number;
+}
+
+export function convertColor(input: string): { success: boolean; result?: ColorInfo; error?: string } {
+  let str = input.trim();
+  let r = 0, g = 0, b = 0;
+
+  try {
+    if (str.startsWith('#')) {
+      let hex = str.slice(1);
+      if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+      }
+      if (hex.length !== 6) {
+        return { success: false, error: 'HEX color must be 3 or 6 characters (e.g. #38bdf8).' };
+      }
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
+    } else if (str.toLowerCase().startsWith('rgb')) {
+      const match = str.match(/\d+/g);
+      if (!match || match.length < 3) {
+        return { success: false, error: 'Invalid rgb() format. Expected rgb(255, 255, 255).' };
+      }
+      r = Math.min(255, parseInt(match[0], 10));
+      g = Math.min(255, parseInt(match[1], 10));
+      b = Math.min(255, parseInt(match[2], 10));
+    } else {
+      return { success: false, error: 'Color format not recognized. Use HEX (e.g. #38bdf8) or RGB (e.g. rgb(56, 189, 248)).' };
+    }
+
+    const toHexVal = (n: number) => n.toString(16).padStart(2, '0');
+    const hex = `#${toHexVal(r)}${toHexVal(g)}${toHexVal(b)}`.toUpperCase();
+    const rgbStr = `rgb(${r}, ${g}, ${b})`;
+    const rgbaStr = `rgba(${r}, ${g}, ${b}, 1.0)`;
+
+    // Calculate HSL
+    const rNorm = r / 255, gNorm = g / 255, bNorm = b / 255;
+    const max = Math.max(rNorm, gNorm, bNorm), min = Math.min(rNorm, gNorm, bNorm);
+    let h = 0, s = 0, l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case rNorm: h = (gNorm - bNorm) / d + (gNorm < bNorm ? 6 : 0); break;
+        case gNorm: h = (bNorm - rNorm) / d + 2; break;
+        case bNorm: h = (rNorm - gNorm) / d + 4; break;
+      }
+      h /= 6;
+    }
+
+    const hslStr = `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+
+    return {
+      success: true,
+      result: {
+        hex,
+        rgb: rgbStr,
+        rgba: rgbaStr,
+        hsl: hslStr,
+        r, g, b
+      }
+    };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+// =========================================================================
+// 21. Dummy Data & Lorem Ipsum Text Generator
+// =========================================================================
+export function generateLoremIpsum(paragraphs: number = 3): string {
+  const words = [
+    'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit',
+    'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
+    'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud',
+    'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo',
+    'consequat', 'duis', 'aute', 'irure', 'in', 'reprehenderit', 'voluptate',
+    'velit', 'esse', 'cillum', 'fugiat', 'nulla', 'pariatur', 'excepteur', 'sint',
+    'occaecat', 'cupidatat', 'non', 'proident', 'sunt', 'culpa', 'qui', 'officia',
+    'deserunt', 'mollit', 'anim', 'id', 'est', 'laborum'
+  ];
+
+  const count = Math.max(1, Math.min(20, paragraphs));
+  const paras: string[] = [];
+
+  for (let p = 0; p < count; p++) {
+    const sentencesCount = 4 + Math.floor(Math.random() * 3);
+    const sentences: string[] = [];
+    for (let s = 0; s < sentencesCount; s++) {
+      const sentenceLen = 6 + Math.floor(Math.random() * 10);
+      const sWords: string[] = [];
+      for (let w = 0; w < sentenceLen; w++) {
+        sWords.push(words[Math.floor(Math.random() * words.length)]);
+      }
+      const sentence = sWords.join(' ');
+      sentences.push(sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.');
+    }
+    paras.push(sentences.join(' '));
+  }
+
+  return paras.join('\n\n');
+}
+
+// =========================================================================
+// 22. URL Query String & URI Component Parser
+// =========================================================================
+export interface ParsedUrlDetails {
+  protocol: string;
+  host: string;
+  port: string;
+  pathname: string;
+  hash: string;
+  searchParams: Record<string, string>;
+}
+
+export function parseUrlQuery(urlStr: string): { success: boolean; result?: ParsedUrlDetails; error?: string } {
+  try {
+    const parsed = new URL(urlStr.trim());
+    const params: Record<string, string> = {};
+    parsed.searchParams.forEach((val, key) => {
+      params[key] = val;
+    });
+
+    return {
+      success: true,
+      result: {
+        protocol: parsed.protocol,
+        host: parsed.host,
+        port: parsed.port || (parsed.protocol === 'https:' ? '443' : parsed.protocol === 'http:' ? '80' : ''),
+        pathname: parsed.pathname,
+        hash: parsed.hash,
+        searchParams: params
+      }
+    };
+  } catch (err: any) {
+    return { success: false, error: `Invalid URL: ${err.message}` };
+  }
+}

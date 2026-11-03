@@ -216,3 +216,34 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Explains minute, hour, day-of-month, month, and day-of-week intervals.
 * **Use Case**: Verifying scheduled batch jobs, recurring cron triggers, and QA test schedules.
 
+### Markdown to HTML Previewer
+* **Icon**: `📝`
+* **Purpose**: Offline renderer translating GitHub Flavored Markdown into HTML with live visual preview.
+* **Features**:
+  - Renders headings, bold/italic, inline code, lists, blockquotes, and links.
+  - One-click copy for clean rendered HTML markup.
+* **Use Case**: Drafting release notes, READMEs, bug ticket descriptions, and documentation offline.
+
+### Color Palette & Format Converter
+* **Icon**: `🎨`
+* **Purpose**: Bidirectional color conversion and visual preview.
+* **Features**:
+  - Converts between HEX (`#38bdf8`), RGB, RGBA, and HSL.
+  - Visual color swatch and interactive native color picker.
+* **Use Case**: QA theme verification, UI debugging, and CSS color extraction.
+
+### Lorem Ipsum Text Generator
+* **Icon**: `📄`
+* **Purpose**: Generates realistic dummy placeholder paragraphs.
+* **Features**:
+  - Customizable paragraph count (1 to 20 paragraphs).
+* **Use Case**: Stress testing UI text overflows, layout shifts, and pagination.
+
+### URL & Query String Parser
+* **Icon**: `🔗`
+* **Purpose**: Decomposes URLs into component parts and extracts query parameters.
+* **Features**:
+  - Separates protocol, host, port, path, and hash fragments.
+  - Converts URL query string parameters into a formatted JSON object.
+* **Use Case**: Debugging complex redirect loops, OAuth callback parameters, and deep links.
+

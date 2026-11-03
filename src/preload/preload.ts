@@ -68,6 +68,18 @@ export const api = {
   },
   http: {
     lookup: (code: number) => ipcRenderer.invoke('http:lookup', code),
+  },
+  markdown: {
+    toHtml: (md: string) => ipcRenderer.invoke('markdown:toHtml', md),
+  },
+  color: {
+    convert: (input: string) => ipcRenderer.invoke('color:convert', input),
+  },
+  lorem: {
+    generate: (count: number) => ipcRenderer.invoke('lorem:generate', count),
+  },
+  url: {
+    parseQuery: (urlStr: string) => ipcRenderer.invoke('url:parseQuery', urlStr),
   }
 };
 

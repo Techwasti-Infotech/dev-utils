@@ -29,7 +29,11 @@ import {
   hexToText,
   generateSecurePassword,
   calculateSubnet,
-  lookupHttpStatusCode
+  lookupHttpStatusCode,
+  markdownToHtml,
+  convertColor,
+  generateLoremIpsum,
+  parseUrlQuery
 } from '../shared/utils/engine';
 
 let mainWindow: BrowserWindow | null = null;
@@ -102,4 +106,8 @@ function setupIpcHandlers() {
   ipcMain.handle('password:generate', (_, options) => generateSecurePassword(options));
   ipcMain.handle('subnet:calculate', (_, cidr) => calculateSubnet(cidr));
   ipcMain.handle('http:lookup', (_, code) => lookupHttpStatusCode(code));
+  ipcMain.handle('markdown:toHtml', (_, md) => markdownToHtml(md));
+  ipcMain.handle('color:convert', (_, input) => convertColor(input));
+  ipcMain.handle('lorem:generate', (_, count) => generateLoremIpsum(count));
+  ipcMain.handle('url:parseQuery', (_, urlStr) => parseUrlQuery(urlStr));
 }

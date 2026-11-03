@@ -47,6 +47,10 @@ Read the detailed [Security & Compliance Guide](docs/SECURITY_AND_COMPLIANCE.md)
 | **Time & Text** | **Unix Timestamp / Epoch** | Convert between Unix epoch seconds/milliseconds and human UTC / Local dates. |
 | | **String Cases & Text Stats** | camelCase, PascalCase, snake_case, kebab-case, word count, line count, and byte size. |
 | | **Cron Expression Explainer** | Translate standard 5-part cron syntax into clear human English. |
+| | **Markdown to HTML Preview** | Offline Markdown parser with live HTML rendering and preview. |
+| | **Lorem Ipsum Text Generator** | Instant multi-paragraph dummy text for UI mockups and testing. |
+| **Web & Styling** | **Color Palette Converter** | Bidirectional converter between HEX, RGB, RGBA, and HSL with interactive swatch. |
+| | **URL & Query String Parser** | Decompose URI parts and extract query string parameters into structured JSON. |
 
 ---
 

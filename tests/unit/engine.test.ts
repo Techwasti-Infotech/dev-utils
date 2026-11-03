@@ -27,7 +27,11 @@ import {
   hexToText,
   generateSecurePassword,
   calculateSubnet,
-  lookupHttpStatusCode
+  lookupHttpStatusCode,
+  markdownToHtml,
+  convertColor,
+  generateLoremIpsum,
+  parseUrlQuery
 } from '../../src/shared/utils/engine';
 
 describe('DevUtils TypeScript Core Engine Unit Tests', () => {
@@ -230,5 +234,48 @@ describe('DevUtils TypeScript Core Engine Unit Tests', () => {
 
     const unknown = lookupHttpStatusCode(999);
     expect(unknown).toBeNull();
+  });
+
+  // 19. Markdown to HTML Converter
+  test('markdownToHtml converts headers, bold, and lists', () => {
+    const md = '# Title\n\n**Bold Text** and `code`\n\n- Item 1\n- Item 2';
+    const html = markdownToHtml(md);
+    expect(html).toContain('<h1>Title</h1>');
+    expect(html).toContain('<strong>Bold Text</strong>');
+    expect(html).toContain('<code>code</code>');
+    expect(html).toContain('<li>Item 1</li>');
+  });
+
+  // 20. Color Palette Converter
+  test('convertColor converts HEX to RGB and HSL', () => {
+    const res = convertColor('#38bdf8');
+    expect(res.success).toBe(true);
+    expect(res.result?.hex).toBe('#38BDF8');
+    expect(res.result?.rgb).toContain('rgb(');
+    expect(res.result?.hsl).toContain('hsl(');
+
+    const rgbRes = convertColor('rgb(56, 189, 248)');
+    expect(rgbRes.success).toBe(true);
+    expect(rgbRes.result?.hex).toBe('#38BDF8');
+  });
+
+  // 21. Lorem Ipsum Generator
+  test('generateLoremIpsum creates paragraphs', () => {
+    const text = generateLoremIpsum(2);
+    expect(text).toContain('.');
+    expect(text.split('\n\n').length).toBe(2);
+  });
+
+  // 22. URL Query String Parser
+  test('parseUrlQuery decomposes URI parts and params', () => {
+    const url = 'https://api.techwasti.com/v1/users?role=qa&status=active#profile';
+    const res = parseUrlQuery(url);
+    expect(res.success).toBe(true);
+    expect(res.result?.protocol).toBe('https:');
+    expect(res.result?.host).toBe('api.techwasti.com');
+    expect(res.result?.pathname).toBe('/v1/users');
+    expect(res.result?.searchParams['role']).toBe('qa');
+    expect(res.result?.searchParams['status']).toBe('active');
+    expect(res.result?.hash).toBe('#profile');
   });
 });

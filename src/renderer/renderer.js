@@ -72,6 +72,22 @@ const toolsMeta = {
   'cron-tab': {
     title: 'Cron Expression Explainer',
     desc: 'Translate 5-part cron schedules into plain English.'
+  },
+  'markdown-tab': {
+    title: 'Markdown to HTML Converter & Preview',
+    desc: 'Render Markdown into sanitized HTML with live preview and syntax translation.'
+  },
+  'color-tab': {
+    title: 'Color Palette & Format Converter',
+    desc: 'Convert color values between HEX, RGB, RGBA, and HSL.'
+  },
+  'lorem-tab': {
+    title: 'Lorem Ipsum Dummy Text Generator',
+    desc: 'Generate paragraphs of placeholder text for UI layouts and test mockups.'
+  },
+  'url-tab': {
+    title: 'URL & Query String Parser',
+    desc: 'Decompose URLs into protocol, host, port, path, hash, and parsed key-value parameters.'
   }
 };
 
@@ -95,6 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTimestampTool();
   setupTextTool();
   setupCronTool();
+  setupMarkdownTool();
+  setupColorTool();
+  setupLoremTool();
+  setupUrlTool();
 });
 
 // Navigation & Tab Switching
@@ -568,6 +588,87 @@ function setupCronTool() {
     } else {
       desc.textContent = res.error;
       desc.style.color = 'var(--error-color)';
+    }
+  };
+}
+
+// 19. Markdown Tool
+function setupMarkdownTool() {
+  const input = document.getElementById('md-input');
+  const preview = document.getElementById('md-preview');
+
+  document.getElementById('md-render-btn').onclick = async () => {
+    const html = await window.devUtilsAPI.markdown.toHtml(input.value);
+    preview.innerHTML = html;
+  };
+
+  document.getElementById('md-copy-btn').onclick = async () => {
+    const html = await window.devUtilsAPI.markdown.toHtml(input.value);
+    navigator.clipboard.writeText(html);
+  };
+
+  document.getElementById('md-clear-btn').onclick = () => {
+    input.value = '';
+    preview.innerHTML = '';
+  };
+}
+
+// 20. Color Tool
+function setupColorTool() {
+  const input = document.getElementById('color-input');
+  const picker = document.getElementById('color-picker');
+  const swatch = document.getElementById('color-swatch');
+
+  const update = async (val) => {
+    const res = await window.devUtilsAPI.color.convert(val);
+    if (res.success && res.result) {
+      document.getElementById('color-hex').value = res.result.hex;
+      document.getElementById('color-rgb').value = res.result.rgb;
+      document.getElementById('color-rgba').value = res.result.rgba;
+      document.getElementById('color-hsl').value = res.result.hsl;
+      swatch.style.backgroundColor = res.result.hex;
+      picker.value = res.result.hex;
+    } else {
+      alert(res.error || 'Color conversion error');
+    }
+  };
+
+  document.getElementById('color-convert-btn').onclick = () => update(input.value);
+  picker.oninput = (e) => {
+    input.value = e.target.value;
+    update(e.target.value);
+  };
+}
+
+// 21. Lorem Ipsum Tool
+function setupLoremTool() {
+  const count = document.getElementById('lorem-count');
+  const output = document.getElementById('lorem-output');
+
+  document.getElementById('lorem-generate-btn').onclick = async () => {
+    output.value = await window.devUtilsAPI.lorem.generate(parseInt(count.value, 10));
+  };
+
+  document.getElementById('lorem-copy-btn').onclick = () => {
+    navigator.clipboard.writeText(output.value);
+  };
+}
+
+// 22. URL Query Tool
+function setupUrlTool() {
+  const input = document.getElementById('url-input');
+
+  document.getElementById('url-parse-btn').onclick = async () => {
+    const res = await window.devUtilsAPI.url.parseQuery(input.value);
+    if (res.success && res.result) {
+      document.getElementById('url-protocol').value = res.result.protocol;
+      document.getElementById('url-host').value = res.result.host;
+      document.getElementById('url-port').value = res.result.port;
+      document.getElementById('url-path').value = res.result.pathname;
+      document.getElementById('url-hash').value = res.result.hash;
+      document.getElementById('url-params-output').value = JSON.stringify(res.result.searchParams, null, 2);
+    } else {
+      alert(res.error || 'URL parsing error');
     }
   };
 }
