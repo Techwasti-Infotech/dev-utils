@@ -31,7 +31,14 @@ import {
   markdownToHtml,
   convertColor,
   generateLoremIpsum,
-  parseUrlQuery
+  parseUrlQuery,
+  jsonToYaml,
+  yamlToJson,
+  validateJsonSchema,
+  calculateChmod,
+  parseEnvFile,
+  jsonToEnvFile,
+  minifyCode
 } from '../../src/shared/utils/engine';
 
 describe('DevUtils TypeScript Core Engine Unit Tests', () => {
@@ -277,5 +284,79 @@ describe('DevUtils TypeScript Core Engine Unit Tests', () => {
     expect(res.result?.searchParams['role']).toBe('qa');
     expect(res.result?.searchParams['status']).toBe('active');
     expect(res.result?.hash).toBe('#profile');
+  });
+
+  // 24. YAML <-> JSON Converter
+  test('jsonToYaml & yamlToJson bidirectional translation', () => {
+    const jsonSample = '{"server":{"port":8080,"host":"localhost"},"enabled":true}';
+    const yamlRes = jsonToYaml(jsonSample);
+    expect(yamlRes.success).toBe(true);
+    expect(yamlRes.result).toContain('server:');
+    expect(yamlRes.result).toContain('port: 8080');
+
+    const jsonRes = yamlToJson(yamlRes.result || '');
+    expect(jsonRes.success).toBe(true);
+    const parsed = JSON.parse(jsonRes.result || '{}');
+    expect(parsed.server.port).toBe(8080);
+    expect(parsed.enabled).toBe(true);
+  });
+
+  // 25. JSON Schema Validator
+  test('validateJsonSchema catches missing fields and invalid types', () => {
+    const schema = JSON.stringify({
+      type: 'object',
+      required: ['name', 'age'],
+      properties: {
+        name: { type: 'string', minLength: 2 },
+        age: { type: 'integer', minimum: 18 }
+      }
+    });
+
+    const validData = JSON.stringify({ name: 'Alice', age: 25 });
+    const resValid = validateJsonSchema(validData, schema);
+    expect(resValid.valid).toBe(true);
+    expect(resValid.errors.length).toBe(0);
+
+    const invalidData = JSON.stringify({ name: 'A', age: 16 });
+    const resInvalid = validateJsonSchema(invalidData, schema);
+    expect(resInvalid.valid).toBe(false);
+    expect(resInvalid.errors.length).toBeGreaterThanOrEqual(2);
+  });
+
+  // 26. Chmod Calculator
+  test('calculateChmod computes octal, symbolic, and permissions breakdown', () => {
+    const res755 = calculateChmod('755');
+    expect(res755.octal).toBe('755');
+    expect(res755.symbolic).toBe('rwxr-xr-x');
+    expect(res755.breakdown.user.read).toBe(true);
+    expect(res755.breakdown.user.write).toBe(true);
+    expect(res755.breakdown.others.write).toBe(false);
+
+    const resSym = calculateChmod('rwxrwxrwx');
+    expect(resSym.octal).toBe('777');
+  });
+
+  // 27. .env <-> JSON
+  test('parseEnvFile and jsonToEnvFile bidirectional conversion', () => {
+    const envStr = 'PORT=3000\nDATABASE_URL=postgres://user:pass@localhost:5432/db\n# Comment\nDEBUG=true';
+    const parsed = parseEnvFile(envStr);
+    expect(parsed.PORT).toBe('3000');
+    expect(parsed.DATABASE_URL).toContain('postgres://');
+    expect(parsed.DEBUG).toBe('true');
+
+    const envRes = jsonToEnvFile(JSON.stringify(parsed));
+    expect(envRes.success).toBe(true);
+    expect(envRes.result).toContain('PORT=3000');
+  });
+
+  // 28. Code Minifier (CSS, HTML, JS)
+  test('minifyCode removes comments, linebreaks and extra spaces', () => {
+    const css = '/* comment */\nbody {\n  background-color: #000;\n  margin: 0px;\n}';
+    const minCss = minifyCode(css, 'css');
+    expect(minCss).toBe('body{background-color:#000;margin:0px}');
+
+    const html = '<!-- comment -->\n<div>\n  <p>Hello World</p>\n</div>';
+    const minHtml = minifyCode(html, 'html');
+    expect(minHtml).toBe('<div><p>Hello World</p></div>');
   });
 });

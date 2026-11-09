@@ -976,3 +976,368 @@ export function parseUrlQuery(urlStr: string): { success: boolean; result?: Pars
     return { success: false, error: `Invalid URL: ${err.message}` };
   }
 }
+
+// =========================================================================
+// 24. YAML ↔ JSON Bidirectional Converter & Formatter
+// =========================================================================
+export function jsonToYaml(jsonStr: string): { success: boolean; result?: string; error?: string } {
+  try {
+    const parsed = JSON.parse(jsonStr);
+    function dumpYaml(obj: any, indent: number = 0): string {
+      const sp = ' '.repeat(indent);
+      if (obj === null) return 'null';
+      if (typeof obj === 'boolean' || typeof obj === 'number') return String(obj);
+      if (typeof obj === 'string') {
+        if (obj.includes('\n') || obj.includes(':') || obj.includes('#') || obj.includes('"') || obj.startsWith(' ') || obj.endsWith(' ')) {
+          return JSON.stringify(obj);
+        }
+        return obj.trim() === '' ? "''" : obj;
+      }
+      if (Array.isArray(obj)) {
+        if (obj.length === 0) return '[]';
+        return obj.map(item => {
+          if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+            const dumped = dumpYaml(item, indent + 2);
+            const lines = dumped.split('\n');
+            const first = lines[0].trimStart();
+            const rest = lines.slice(1).map(l => '  ' + l).join('\n');
+            return `${sp}- ${first}${rest ? '\n' + rest : ''}`;
+          }
+          return `${sp}- ${dumpYaml(item, indent + 2)}`;
+        }).join('\n');
+      }
+      if (typeof obj === 'object') {
+        const keys = Object.keys(obj);
+        if (keys.length === 0) return '{}';
+        return keys.map(k => {
+          const val = obj[k];
+          if (typeof val === 'object' && val !== null) {
+            const childDump = dumpYaml(val, indent + 2);
+            if (Array.isArray(val) && val.length > 0) {
+              return `${sp}${k}:\n${childDump}`;
+            }
+            if (!Array.isArray(val) && Object.keys(val).length > 0) {
+              return `${sp}${k}:\n${childDump}`;
+            }
+            return `${sp}${k}: ${childDump}`;
+          }
+          return `${sp}${k}: ${dumpYaml(val, indent)}`;
+        }).join('\n');
+      }
+      return String(obj);
+    }
+    return { success: true, result: dumpYaml(parsed) };
+  } catch (err: any) {
+    return { success: false, error: `JSON Parse Error: ${err.message}` };
+  }
+}
+
+export function yamlToJson(yamlStr: string): { success: boolean; result?: string; error?: string } {
+  try {
+    const lines = yamlStr.split('\n');
+    function parseValue(val: string): any {
+      const v = val.trim();
+      if (v === 'null' || v === '~') return null;
+      if (v === 'true') return true;
+      if (v === 'false') return false;
+      if (!isNaN(Number(v)) && v !== '') return Number(v);
+      if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+        return v.substring(1, v.length - 1);
+      }
+      if (v.startsWith('[') && v.endsWith(']')) {
+        try { return JSON.parse(v); } catch { return v; }
+      }
+      if (v.startsWith('{') && v.endsWith('}')) {
+        try { return JSON.parse(v); } catch { return v; }
+      }
+      return v;
+    }
+
+    let cursor = 0;
+    function parseBlock(currentIndent: number): any {
+      let isArray = false;
+      let arrayResult: any[] = [];
+      let objResult: Record<string, any> = {};
+
+      while (cursor < lines.length) {
+        const rawLine = lines[cursor];
+        const trimmed = rawLine.trim();
+        if (!trimmed || trimmed.startsWith('#')) {
+          cursor++;
+          continue;
+        }
+
+        const indent = rawLine.search(/\S/);
+        if (indent < currentIndent) {
+          break;
+        }
+
+        if (trimmed.startsWith('- ')) {
+          isArray = true;
+          const content = trimmed.substring(2).trim();
+          if (content.includes(':')) {
+            const colonIdx = content.indexOf(':');
+            const k = content.substring(0, colonIdx).trim();
+            const valStr = content.substring(colonIdx + 1).trim();
+            cursor++;
+            const itemObj: Record<string, any> = {};
+            if (valStr) {
+              itemObj[k] = parseValue(valStr);
+            } else {
+              itemObj[k] = parseBlock(indent + 2);
+            }
+            arrayResult.push(itemObj);
+          } else {
+            cursor++;
+            arrayResult.push(parseValue(content));
+          }
+        } else if (trimmed.includes(':')) {
+          const colonIdx = trimmed.indexOf(':');
+          const key = trimmed.substring(0, colonIdx).trim();
+          const valStr = trimmed.substring(colonIdx + 1).trim();
+
+          if (valStr) {
+            objResult[key] = parseValue(valStr);
+            cursor++;
+          } else {
+            cursor++;
+            objResult[key] = parseBlock(indent + 2);
+          }
+        } else {
+          cursor++;
+        }
+      }
+
+      return isArray ? arrayResult : objResult;
+    }
+
+    const res = parseBlock(0);
+    return { success: true, result: JSON.stringify(res, null, 2) };
+  } catch (err: any) {
+    return { success: false, error: `YAML Parse Error: ${err.message}` };
+  }
+}
+
+// =========================================================================
+// 25. JSON Schema Validator
+// =========================================================================
+export interface SchemaValidationResult {
+  valid: boolean;
+  errors: string[];
+}
+
+export function validateJsonSchema(dataJson: string, schemaJson: string): SchemaValidationResult {
+  const errors: string[] = [];
+  let data: any;
+  let schema: any;
+
+  try {
+    data = JSON.parse(dataJson);
+  } catch (e: any) {
+    return { valid: false, errors: [`Data is invalid JSON: ${e.message}`] };
+  }
+
+  try {
+    schema = JSON.parse(schemaJson);
+  } catch (e: any) {
+    return { valid: false, errors: [`Schema is invalid JSON: ${e.message}`] };
+  }
+
+  function validateNode(val: any, s: any, path: string) {
+    if (!s || typeof s !== 'object') return;
+
+    // Type check
+    if (s.type) {
+      const actualType = Array.isArray(val) ? 'array' : val === null ? 'null' : typeof val;
+      if (s.type === 'integer') {
+        if (typeof val !== 'number' || !Number.isInteger(val)) {
+          errors.push(`At ${path}: expected integer, got ${actualType}`);
+        }
+      } else if (s.type === 'number') {
+        if (typeof val !== 'number') {
+          errors.push(`At ${path}: expected number, got ${actualType}`);
+        }
+      } else if (actualType !== s.type) {
+        errors.push(`At ${path}: expected ${s.type}, got ${actualType}`);
+      }
+    }
+
+    // Required fields in object
+    if (s.type === 'object' && s.required && Array.isArray(s.required) && typeof val === 'object' && val !== null) {
+      for (const reqKey of s.required) {
+        if (!(reqKey in val)) {
+          errors.push(`At ${path}: missing required field "${reqKey}"`);
+        }
+      }
+    }
+
+    // Properties validation
+    if (s.type === 'object' && s.properties && typeof val === 'object' && val !== null) {
+      for (const [propName, propSchema] of Object.entries(s.properties)) {
+        if (propName in val) {
+          validateNode(val[propName], propSchema, path === 'root' ? propName : `${path}.${propName}`);
+        }
+      }
+    }
+
+    // Numbers min/max
+    if (typeof val === 'number') {
+      if (s.minimum !== undefined && val < s.minimum) errors.push(`At ${path}: value ${val} < minimum ${s.minimum}`);
+      if (s.maximum !== undefined && val > s.maximum) errors.push(`At ${path}: value ${val} > maximum ${s.maximum}`);
+    }
+
+    // Strings minLength/maxLength/pattern
+    if (typeof val === 'string') {
+      if (s.minLength !== undefined && val.length < s.minLength) errors.push(`At ${path}: length ${val.length} < minLength ${s.minLength}`);
+      if (s.maxLength !== undefined && val.length > s.maxLength) errors.push(`At ${path}: length ${val.length} > maxLength ${s.maxLength}`);
+      if (s.pattern) {
+        try {
+          const reg = new RegExp(s.pattern);
+          if (!reg.test(val)) errors.push(`At ${path}: "${val}" does not match pattern ${s.pattern}`);
+        } catch {}
+      }
+    }
+
+    // Array items
+    if (Array.isArray(val) && s.items) {
+      val.forEach((item, idx) => {
+        validateNode(item, s.items, `${path}[${idx}]`);
+      });
+    }
+  }
+
+  validateNode(data, schema, 'root');
+  return { valid: errors.length === 0, errors };
+}
+
+// =========================================================================
+// 26. Chmod / Unix Permissions Calculator
+// =========================================================================
+export interface ChmodResult {
+  octal: string;
+  symbolic: string;
+  command: string;
+  breakdown: {
+    user: { read: boolean; write: boolean; execute: boolean };
+    group: { read: boolean; write: boolean; execute: boolean };
+    others: { read: boolean; write: boolean; execute: boolean };
+  };
+}
+
+export function calculateChmod(input: string): ChmodResult {
+  let u = 0, g = 0, o = 0;
+  const str = input.trim();
+
+  // If octal e.g. 755 or 0755
+  if (/^0?[0-7]{3}$/.test(str)) {
+    const oct = str.length === 4 ? str.substring(1) : str;
+    u = parseInt(oct[0], 10);
+    g = parseInt(oct[1], 10);
+    o = parseInt(oct[2], 10);
+  }
+  // If symbolic e.g. -rwxr-xr-x or rwxr-xr-x
+  else if (/^[-d]?[rwx-]{9}$/.test(str)) {
+    const sym = str.length === 10 ? str.substring(1) : str;
+    u = (sym[0] === 'r' ? 4 : 0) + (sym[1] === 'w' ? 2 : 0) + (sym[2] === 'x' ? 1 : 0);
+    g = (sym[3] === 'r' ? 4 : 0) + (sym[4] === 'w' ? 2 : 0) + (sym[5] === 'x' ? 1 : 0);
+    o = (sym[6] === 'r' ? 4 : 0) + (sym[7] === 'w' ? 2 : 0) + (sym[8] === 'x' ? 1 : 0);
+  } else {
+    // Default fallback 755
+    u = 7; g = 5; o = 5;
+  }
+
+  function toSym(val: number): string {
+    return (val & 4 ? 'r' : '-') + (val & 2 ? 'w' : '-') + (val & 1 ? 'x' : '-');
+  }
+
+  const symbolic = `${toSym(u)}${toSym(g)}${toSym(o)}`;
+  const octal = `${u}${g}${o}`;
+
+  return {
+    octal,
+    symbolic,
+    command: `chmod ${octal} <file>`,
+    breakdown: {
+      user: { read: Boolean(u & 4), write: Boolean(u & 2), execute: Boolean(u & 1) },
+      group: { read: Boolean(g & 4), write: Boolean(g & 2), execute: Boolean(g & 1) },
+      others: { read: Boolean(o & 4), write: Boolean(o & 2), execute: Boolean(o & 1) }
+    }
+  };
+}
+
+// =========================================================================
+// 27. Key-Value & .env Environment File Parser
+// =========================================================================
+export interface EnvParseResult {
+  envToJson: Record<string, string>;
+  jsonToEnv: string;
+}
+
+export function parseEnvFile(envContent: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  const lines = envContent.split('\n');
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const idx = trimmed.indexOf('=');
+    if (idx > 0) {
+      const key = trimmed.substring(0, idx).trim();
+      let val = trimmed.substring(idx + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.substring(1, val.length - 1);
+      }
+      result[key] = val;
+    }
+  }
+  return result;
+}
+
+export function jsonToEnvFile(jsonStr: string): { success: boolean; result?: string; error?: string } {
+  try {
+    const obj = JSON.parse(jsonStr);
+    const lines = Object.entries(obj).map(([k, v]) => {
+      const valStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      if (valStr.includes(' ') || valStr.includes('\n')) {
+        return `${k}="${valStr.replace(/"/g, '\\"')}"`;
+      }
+      return `${k}=${valStr}`;
+    });
+    return { success: true, result: lines.join('\n') };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+// =========================================================================
+// 28. Quick Code Minifier (JS/CSS/HTML)
+// =========================================================================
+export function minifyCode(code: string, lang: 'javascript' | 'css' | 'html'): string {
+  if (!code) return '';
+  if (lang === 'css') {
+    return code
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s*([{}:;,])\s*/g, '$1')
+      .replace(/;}/g, '}')
+      .trim();
+  }
+  if (lang === 'html') {
+    return code
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/>\s+</g, '><')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+  // javascript basic minifier
+  return code
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\/.*$/gm, '')
+    .replace(/^\s+|\s+$/gm, '')
+    .split('\n')
+    .filter(line => line.length > 0)
+    .join(' ')
+    .replace(/\s*([=+\-*/%&|<>!?:;,{}()[\]])\s*/g, '$1')
+    .trim();
+}
+

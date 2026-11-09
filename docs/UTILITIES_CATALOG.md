@@ -1,6 +1,6 @@
 # 🧰 DevUtils Utilities Catalog & Reference
 
-This document provides a comprehensive reference for all **18 offline developer and QA utilities** available in DevUtils.
+This document provides a comprehensive reference for all **24 offline developer and QA utilities** available in DevUtils.
 
 Every utility runs **100% locally on your desktop machine**, ensuring sensitive credentials, tokens, customer PII, and production payloads never touch the internet.
 
@@ -10,6 +10,7 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
 
 - [1. Data & Formatting Utilities](#1-data--formatting-utilities)
   - [JSON Formatter & Minifier](#json-formatter--minifier)
+  - [YAML ↔ JSON Converter](#yaml--json-converter)
   - [JSON ↔ CSV Converter](#json--csv-converter)
   - [XML Formatter & Validator](#xml-formatter--validator)
   - [SQL Formatter & Query Beautifier](#sql-formatter--query-beautifier)
@@ -21,18 +22,28 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - [Base64 / URL / HTML Entity Codec](#base64--url--html-entity-codec)
   - [Hex ↔ UTF-8 Text Converter](#hex--utf-8-text-converter)
 - [4. Testing & QA Utilities](#4-testing--qa-utilities)
+  - [REST Client & API Testing (Bruno-compatible)](#rest-client--api-testing-bruno-compatible)
+  - [JSON Schema Validator](#json-schema-validator)
   - [Regex Tester & Pattern Debugger](#regex-tester--pattern-debugger)
   - [Text Diff & Payload Comparator](#text-diff--payload-comparator)
   - [UUID & GUID Batch Generator](#uuid--guid-batch-generator)
   - [QA Mock Data & User Profile Generator](#qa-mock-data--user-profile-generator)
   - [HTTP Status Code & Header Lookup](#http-status-code--header-lookup)
-- [5. Networking & API Tools](#5-networking--api-tools)
+- [5. DevOps & Environment](#5-devops--environment)
+  - [Unix Chmod Permissions Calculator](#unix-chmod-permissions-calculator)
+  - [.env ↔ JSON Environment Config](#env--json-environment-config)
+  - [Quick Code Minifier (JS / CSS / HTML)](#quick-code-minifier-js--css--html)
+- [6. Networking & API Tools](#6-networking--api-tools)
   - [cURL to Code Converter](#curl-to-code-converter)
   - [CIDR / IPv4 Subnet Calculator](#cidr--ipv4-subnet-calculator)
-- [6. Time, Math & Text Processing](#6-time-math--text-processing)
+  - [URL & Query String Parser](#url--query-string-parser)
+- [7. Time, Math & Text Processing](#7-time-math--text-processing)
   - [Unix Epoch & Timestamp Converter](#unix-epoch--timestamp-converter)
   - [String Case Converter & Text Inspector](#string-case-converter--text-inspector)
   - [Cron Expression Explainer](#cron-expression-explainer)
+  - [Markdown to HTML Previewer](#markdown-to-html-previewer)
+  - [Lorem Ipsum Text Generator](#lorem-ipsum-text-generator)
+  - [Color Palette & Format Converter](#color-palette--format-converter)
 
 ---
 
@@ -46,6 +57,15 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - One-click minification for compact payload transmission.
   - Detailed error reporting with character/line diagnostics for malformed inputs.
 * **Use Case**: Cleaning up minified REST API responses and preparing payload bodies for QA tests.
+
+### YAML ↔ JSON Converter
+* **Icon**: `📄`
+* **Purpose**: Bidirectional translation between YAML and JSON configuration files.
+* **Features**:
+  - Converts complex YAML hierarchies (mappings, sequences, nested structures) to formatted JSON.
+  - Generates clean, human-readable YAML from JSON objects.
+  - Preserves types (booleans, integers, floats, strings, nulls).
+* **Use Case**: Editing Kubernetes manifests, GitHub Actions workflows, Docker Compose files, and OpenAPI specs.
 
 ### JSON ↔ CSV Converter
 * **Icon**: `⇄`
@@ -127,6 +147,31 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
 
 ## 4. Testing & QA Utilities
 
+### REST Client & API Testing (Bruno-compatible)
+* **Icon**: `🚀`
+* **Purpose**: Native offline HTTP/REST client and test runner matching Bruno's feature set.
+* **Features**:
+  - Full HTTP method support: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`.
+  - Environment variable interpolation using `{{variable_name}}` across URLs, headers, params, and bodies.
+  - Authentication options: Bearer Tokens, Basic Auth (`username`/`password`), and API Key placement (Header or Query).
+  - Rich payload bodies: JSON (with beautifier), Form URL-Encoded, Plain Text, and XML.
+  - Declarative Bruno-style assertions: `res.status: eq 200`, `res.responseTime: lte 2000`, `res.body.property: eq/neq/contains/isDefined/isEmpty`.
+  - Post-response JavaScript test sandbox with `test(name, fn)`, `expect()`, and console captures.
+  - Pre-request scripts to dynamically prepare headers and environment variables.
+  - Bruno `.bru` declarative file format: 1-click import and export.
+  - Copy reproducible `cURL` CLI commands.
+* **Use Case**: Testing local microservices, debugging REST endpoints, running automated QA assertion suites, and collaborating via Git-friendly `.bru` request files.
+
+### JSON Schema Validator
+* **Icon**: `📋`
+* **Purpose**: Validates JSON payloads against draft JSON Schema specifications.
+* **Features**:
+  - Validates object properties, required attributes, and nested hierarchies.
+  - Checks numeric ranges (`minimum`, `maximum`), string lengths (`minLength`, `maxLength`), and regex patterns (`pattern`).
+  - Detailed error messages showing exact property paths and discrepancies.
+  - Includes a one-click sample loader.
+* **Use Case**: Verifying API contract compliance, validating schema migration scripts, and preventing breaking schema changes.
+
 ### Regex Tester & Pattern Debugger
 * **Icon**: `.*`
 * **Purpose**: Test regular expressions against text and log files.
@@ -171,7 +216,37 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
 
 ---
 
-## 5. Networking & API Tools
+## 5. DevOps & Environment
+
+### Unix Chmod Permissions Calculator
+* **Icon**: `🛡️`
+* **Purpose**: Calculate octal and symbolic Linux/Unix file permissions.
+* **Features**:
+  - Bi-directional calculation from octal (e.g. `755`, `644`) or symbolic (e.g. `rwxr-xr-x`).
+  - Interactive permission matrix checkboxes for User, Group, and Others (Read: 4, Write: 2, Execute: 1).
+  - Generates ready-to-use terminal command: `chmod <octal> <file>`.
+* **Use Case**: Setting execution rights on deployment shell scripts, securing private SSH keys (`600`), and configuring CI/CD runners.
+
+### .env ↔ JSON Environment Config
+* **Icon**: `⚙️`
+* **Purpose**: Bidirectional translation between dotenv (`.env`) format and structured JSON.
+* **Features**:
+  - Parses key-value environment variables, ignoring comments and stripping quotes.
+  - Generates valid `.env` file syntax from JSON configuration maps.
+* **Use Case**: Converting container environment variables for Kubernetes ConfigMaps, AWS Secrets Manager, and local `.env.local` files.
+
+### Quick Code Minifier (JS / CSS / HTML)
+* **Icon**: `⚡`
+* **Purpose**: Fast offline compression for frontend web assets.
+* **Features**:
+  - Language selection: JavaScript, CSS, and HTML.
+  - Removes block and line comments, excessive whitespace, and unnecessary linebreaks.
+  - Displays original size, minified size, and percentage saved.
+* **Use Case**: Packaging small inline scripts, compacting bookmarklets, and reducing CSS bundle sizes offline.
+
+---
+
+## 6. Networking & API Tools
 
 ### cURL to Code Converter
 * **Icon**: `🌐`
@@ -190,7 +265,7 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
 
 ---
 
-## 6. Time, Math & Text Processing
+## 7. Time, Math & Text Processing
 
 ### Unix Epoch & Timestamp Converter
 * **Icon**: `⏱️`

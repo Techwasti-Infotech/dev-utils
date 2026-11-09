@@ -440,3 +440,400 @@ textarea:focus {
   margin-top: 8px;
 }
 
+/* =========================================================================
+   REST API Testing Tool (Bruno) Styles
+   ========================================================================= */
+.rest-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.rest-method-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.rest-url-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: monospace;
+  outline: none;
+}
+.rest-url-input:focus {
+  border-color: var(--accent-color);
+}
+
+.rest-send-btn {
+  font-weight: 600;
+  padding: 8px 18px;
+}
+
+.rest-sub-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-pane);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+}
+
+.rest-sub-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rest-sub-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.rest-env-select, .rest-collection-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.divider-v {
+  width: 1px;
+  height: 16px;
+  background: var(--border-color);
+  margin: 0 4px;
+}
+
+.rest-quick-tag {
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.rest-collapsible-panel {
+  background: var(--bg-pane);
+  border: 1px solid var(--accent-color);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  color: var(--text-light);
+}
+
+.panel-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.panel-hint code {
+  color: var(--accent-color);
+  background: var(--bg-input);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.rest-split-container {
+  display: flex;
+  gap: 12px;
+  height: calc(100vh - 200px);
+}
+
+.rest-pane-left, .rest-pane-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-pane);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rest-sub-tabs {
+  display: flex;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.rest-sub-tab, .res-sub-tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 8px 14px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rest-sub-tab.active, .res-sub-tab.active {
+  color: var(--accent-color);
+  border-bottom-color: var(--accent-color);
+  background: rgba(97, 175, 239, 0.08);
+}
+
+.rest-tab-section, .res-pane-section {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.rest-tab-section.active, .res-pane-section.active {
+  display: flex;
+}
+
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+
+.kv-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.kv-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kv-row input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.kv-row input[type="text"] {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.btn-icon-del {
+  background: transparent;
+  border: none;
+  color: var(--error-color);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 14px;
+}
+
+.auth-config-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-row, .auth-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.rest-input-select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  padding: 6px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.body-options-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--text-light);
+}
+
+.response-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.response-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.res-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  font-family: monospace;
+}
+
+.res-badge-2xx {
+  background: rgba(152, 195, 121, 0.2);
+  color: var(--success-color);
+  border-color: var(--success-color);
+}
+
+.res-badge-4xx, .res-badge-5xx, .res-badge-err {
+  background: rgba(224, 108, 117, 0.2);
+  color: var(--error-color);
+  border-color: var(--error-color);
+}
+
+.res-badge-3xx {
+  background: rgba(229, 192, 123, 0.2);
+  color: var(--warning-color);
+  border-color: var(--warning-color);
+}
+
+.res-body-controls {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+}
+
+.res-textarea {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  border-radius: 6px;
+  padding: 10px;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 12px;
+  resize: none;
+  outline: none;
+  white-space: pre;
+}
+
+.res-preview-frame {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.res-headers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.res-header-item {
+  display: flex;
+  background: var(--bg-input);
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.res-header-name {
+  width: 200px;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.res-header-val {
+  flex: 1;
+  color: var(--text-light);
+  word-break: break-all;
+}
+
+.test-results-summary {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: var(--bg-input);
+}
+
+.test-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.test-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.test-pass {
+  background: rgba(152, 195, 121, 0.1);
+  border-left: 4px solid var(--success-color);
+}
+
+.test-fail {
+  background: rgba(224, 108, 117, 0.1);
+  border-left: 4px solid var(--error-color);
+}
+
+.res-console-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.console-log-line {
+  padding: 2px 0;
+  color: var(--text-light);
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.05);
+}
+
+

@@ -19,13 +19,16 @@
       </div>
 
       <div class="search-box">
-        <input type="text" id="tool-search" placeholder="Search 18 utilities (Ctrl+K)...">
+        <input type="text" id="tool-search" placeholder="Search 24 utilities (Ctrl+K)...">
       </div>
 
       <nav class="nav-menu" id="nav-menu">
         <div class="nav-section-label">DATA & FORMATTING</div>
         <button class="nav-item active" data-tab="json-tab">
           <span class="icon">{}</span> JSON Formatter & Minifier
+        </button>
+        <button class="nav-item" data-tab="yaml-tab">
+          <span class="icon">📄</span> YAML ↔ JSON Converter
         </button>
         <button class="nav-item" data-tab="jwt-tab">
           <span class="icon">🔑</span> JWT Inspector
@@ -55,6 +58,12 @@
         </button>
 
         <div class="nav-section-label">TESTING & QA UTILITIES</div>
+        <button class="nav-item" data-tab="rest-tab">
+          <span class="icon">🚀</span> REST Client & Tests (Bruno)
+        </button>
+        <button class="nav-item" data-tab="schema-tab">
+          <span class="icon">📋</span> JSON Schema Validator
+        </button>
         <button class="nav-item" data-tab="regex-tab">
           <span class="icon">.*</span> Regex Tester & Debugger
         </button>
@@ -66,6 +75,17 @@
         </button>
         <button class="nav-item" data-tab="http-tab">
           <span class="icon">📡</span> HTTP Status & Headers Lookup
+        </button>
+
+        <div class="nav-section-label">DEVOPS & ENVIRONMENT</div>
+        <button class="nav-item" data-tab="chmod-tab">
+          <span class="icon">🛡️</span> Unix Chmod Calculator
+        </button>
+        <button class="nav-item" data-tab="env-tab">
+          <span class="icon">⚙️</span> .env ↔ JSON Config
+        </button>
+        <button class="nav-item" data-tab="minifier-tab">
+          <span class="icon">⚡</span> Code Minifier (JS/CSS/HTML)
         </button>
 
         <div class="nav-section-label">TIME & TEXT</div>
@@ -543,6 +563,381 @@
               <textarea id="url-params-output" readonly></textarea>
             </div>
           </div>
+        </section>
+        <!-- 23. REST API Testing Tool (Bruno-compatible) Tab -->
+        <section id="rest-tab" class="tab-pane">
+          <!-- Request Top Bar -->
+          <div class="rest-top-bar">
+            <select id="rest-method" class="rest-method-select">
+              <option value="GET" selected>GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+              <option value="HEAD">HEAD</option>
+              <option value="OPTIONS">OPTIONS</option>
+            </select>
+            <input type="text" id="rest-url" class="rest-url-input" placeholder="https://api.example.com/v1/users/{{userId}} or http://127.0.0.1:3000/api" value="https://jsonplaceholder.typicode.com/todos/1">
+            <button id="rest-send-btn" class="btn btn-primary rest-send-btn">
+              <span>▶ Send</span>
+            </button>
+            <button id="rest-save-bru-btn" class="btn btn-secondary" title="Export as Bruno .bru file">
+              <span>💾 .bru</span>
+            </button>
+            <button id="rest-import-bru-btn" class="btn btn-secondary" title="Import Bruno .bru file">
+              <span>📂 Open</span>
+            </button>
+            <button id="rest-copy-curl-btn" class="btn btn-ghost" title="Copy as cURL">
+              <span>📋 cURL</span>
+            </button>
+          </div>
+
+          <!-- Secondary Toolbar: Environment & Collections -->
+          <div class="rest-sub-bar">
+            <div class="rest-sub-left">
+              <label class="rest-sub-label">Environment:</label>
+              <select id="rest-env-select" class="rest-env-select">
+                <option value="none">No Environment</option>
+                <option value="local">Local (localhost:3000)</option>
+                <option value="staging">Staging</option>
+                <option value="production">Production</option>
+                <option value="custom">Custom Env</option>
+              </select>
+              <button id="rest-env-edit-btn" class="btn btn-ghost btn-sm" title="Manage Environment Variables">⚙️ Vars</button>
+
+              <span class="divider-v"></span>
+
+              <label class="rest-sub-label">Collection:</label>
+              <select id="rest-collection-select" class="rest-collection-select">
+                <option value="demo-todos">Demo: JSONPlaceholder APIs</option>
+                <option value="custom-coll">My Collection</option>
+              </select>
+              <button id="rest-save-to-coll-btn" class="btn btn-ghost btn-sm" title="Save current request to collection">➕ Save</button>
+            </div>
+            <div class="rest-sub-right">
+              <span id="rest-quick-stats" class="rest-quick-tag">Ready</span>
+            </div>
+          </div>
+
+          <!-- Environment Variables Modal / Flyout (Collapsible) -->
+          <div id="rest-env-panel" class="rest-collapsible-panel" style="display: none;">
+            <div class="panel-header">
+              <strong>Active Environment Variables (Key-Value)</strong>
+              <button id="rest-env-close-btn" class="btn btn-ghost btn-sm">✕ Close</button>
+            </div>
+            <p class="panel-hint">Variables can be referenced in URL, headers, and body with <code>{{variable_name}}</code> syntax.</p>
+            <textarea id="rest-env-vars-input" rows="4" placeholder="baseUrl: https://api.example.com&#10;userId: 1&#10;token: your_secret_token"></textarea>
+            <div style="margin-top: 6px;">
+              <button id="rest-env-save-vars-btn" class="btn btn-primary btn-sm">Apply Variables</button>
+            </div>
+          </div>
+
+          <!-- Split Workspace: Left = Request Config, Right = Response & Test Results -->
+          <div class="rest-split-container">
+            <!-- Left Pane: Request Tabs -->
+            <div class="rest-pane-left">
+              <div class="rest-sub-tabs">
+                <button class="rest-sub-tab active" data-sub="params">Params</button>
+                <button class="rest-sub-tab" data-sub="headers">Headers</button>
+                <button class="rest-sub-tab" data-sub="auth">Auth</button>
+                <button class="rest-sub-tab" data-sub="body">Body</button>
+                <button class="rest-sub-tab" data-sub="assert">Assertions</button>
+                <button class="rest-sub-tab" data-sub="tests">Tests (JS)</button>
+                <button class="rest-sub-tab" data-sub="prescript">Pre-Script</button>
+              </div>
+
+              <!-- Sub-tab Content: Params -->
+              <div id="rest-tab-params" class="rest-tab-section active">
+                <div class="table-toolbar">
+                  <span>Query Parameters</span>
+                  <button id="rest-add-param-btn" class="btn btn-ghost btn-sm">+ Add Parameter</button>
+                </div>
+                <div id="rest-params-list" class="kv-list-container">
+                  <!-- Dynamically populated or default rows -->
+                </div>
+              </div>
+
+              <!-- Sub-tab Content: Headers -->
+              <div id="rest-tab-headers" class="rest-tab-section">
+                <div class="table-toolbar">
+                  <span>Request Headers</span>
+                  <button id="rest-add-header-btn" class="btn btn-ghost btn-sm">+ Add Header</button>
+                </div>
+                <div id="rest-headers-list" class="kv-list-container">
+                  <!-- Dynamically populated rows -->
+                </div>
+              </div>
+
+              <!-- Sub-tab Content: Auth -->
+              <div id="rest-tab-auth" class="rest-tab-section">
+                <div class="auth-config-box">
+                  <div class="auth-row">
+                    <label>Auth Type:</label>
+                    <select id="rest-auth-type" class="rest-input-select">
+                      <option value="none">No Auth</option>
+                      <option value="bearer">Bearer Token</option>
+                      <option value="basic">Basic Auth</option>
+                      <option value="apikey">API Key</option>
+                    </select>
+                  </div>
+                  <div id="rest-auth-bearer-group" class="auth-group" style="display: none;">
+                    <label>Bearer Token:</label>
+                    <input type="text" id="rest-auth-bearer-token" placeholder="Enter token or {{token}}">
+                  </div>
+                  <div id="rest-auth-basic-group" class="auth-group" style="display: none;">
+                    <label>Username:</label>
+                    <input type="text" id="rest-auth-basic-user" placeholder="Username">
+                    <label>Password:</label>
+                    <input type="password" id="rest-auth-basic-pass" placeholder="Password">
+                  </div>
+                  <div id="rest-auth-apikey-group" class="auth-group" style="display: none;">
+                    <label>Key:</label>
+                    <input type="text" id="rest-auth-apikey-key" placeholder="e.g. X-API-Key">
+                    <label>Value:</label>
+                    <input type="text" id="rest-auth-apikey-val" placeholder="Secret Key Value">
+                    <label>Add To:</label>
+                    <select id="rest-auth-apikey-place" class="rest-input-select">
+                      <option value="header">Header</option>
+                      <option value="query">Query Params</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sub-tab Content: Body -->
+              <div id="rest-tab-body" class="rest-tab-section">
+                <div class="body-options-bar">
+                  <label><input type="radio" name="rest-body-type" value="none" checked> None</label>
+                  <label><input type="radio" name="rest-body-type" value="json"> JSON</label>
+                  <label><input type="radio" name="rest-body-type" value="form-urlencoded"> Form URL-Encoded</label>
+                  <label><input type="radio" name="rest-body-type" value="text"> Plain Text</label>
+                  <label><input type="radio" name="rest-body-type" value="xml"> XML</label>
+                  <button id="rest-format-body-btn" class="btn btn-ghost btn-sm" style="margin-left: auto;">Format JSON</button>
+                </div>
+                <div id="rest-body-raw-container">
+                  <textarea id="rest-body-raw" rows="12" placeholder='{\n  "title": "foo",\n  "body": "bar",\n  "userId": 1\n}'></textarea>
+                </div>
+              </div>
+
+              <!-- Sub-tab Content: Assertions (Bruno-style) -->
+              <div id="rest-tab-assert" class="rest-tab-section">
+                <div class="table-toolbar">
+                  <span>Bruno Declarative Assertions</span>
+                  <button id="rest-add-assert-example-btn" class="btn btn-ghost btn-sm">Insert Examples</button>
+                </div>
+                <p class="panel-hint">Rules: <code>res.status: eq 200</code>, <code>res.responseTime: lte 1500</code>, <code>res.body.id: eq 1</code>, <code>res.body: isDefined</code></p>
+                <textarea id="rest-assertions-input" rows="8" placeholder="res.status: eq 200&#10;res.responseTime: lte 2000&#10;res.body.id: isDefined"></textarea>
+              </div>
+
+              <!-- Sub-tab Content: Tests (JS Script) -->
+              <div id="rest-tab-tests" class="rest-tab-section">
+                <div class="table-toolbar">
+                  <span>Post-Response Test Script</span>
+                  <button id="rest-add-test-snippet-btn" class="btn btn-ghost btn-sm">Insert Snippet</button>
+                </div>
+                <p class="panel-hint">Available globals: <code>res</code> (status, headers, data, responseTime), <code>test(name, fn)</code>, <code>expect(val)</code>, <code>console.log()</code></p>
+                <textarea id="rest-test-script" rows="9" placeholder='test("Status is 200", () => {&#10;  expect(res.status).toBe(200);&#10;});&#10;test("Response is fast", () => {&#10;  expect(res.responseTime).toBeLessThan(2000);&#10;});'></textarea>
+              </div>
+
+              <!-- Sub-tab Content: Pre-request Script -->
+              <div id="rest-tab-prescript" class="rest-tab-section">
+                <div class="table-toolbar">
+                  <span>Pre-Request Script (runs before sending)</span>
+                </div>
+                <p class="panel-hint">Set environment variables dynamically before the request: <code>env.myDynamicVar = Date.now();</code></p>
+                <textarea id="rest-prescript-input" rows="9" placeholder='// Set dynamic values or tokens before sending&#10;env.currentTimestamp = Date.now();&#10;console.log("Starting REST request...");'></textarea>
+              </div>
+            </div>
+
+            <!-- Right Pane: Response Viewer & Test Results -->
+            <div class="rest-pane-right">
+              <!-- Response Summary Pill Bar -->
+              <div class="response-header-bar">
+                <div class="response-badges">
+                  <span id="res-status-badge" class="res-badge res-badge-idle">Status: --</span>
+                  <span id="res-time-badge" class="res-badge">Time: -- ms</span>
+                  <span id="res-size-badge" class="res-badge">Size: -- B</span>
+                </div>
+                <div class="response-actions">
+                  <button id="res-copy-body-btn" class="btn btn-ghost btn-sm">Copy Body</button>
+                  <button id="res-clear-btn" class="btn btn-ghost btn-sm">Clear</button>
+                </div>
+              </div>
+
+              <!-- Response Sub-Tabs -->
+              <div class="rest-sub-tabs res-sub-tabs">
+                <button class="res-sub-tab active" data-res-tab="res-body">Response Body</button>
+                <button class="res-sub-tab" data-res-tab="res-headers">Headers (<span id="res-headers-count">0</span>)</button>
+                <button class="res-sub-tab" data-res-tab="res-tests">Test Results (<span id="res-tests-count">0</span>)</button>
+                <button class="res-sub-tab" data-res-tab="res-console">Logs (<span id="res-console-count">0</span>)</button>
+                <button class="res-sub-tab" data-res-tab="res-bru-preview">.bru File</button>
+              </div>
+
+              <!-- Response Body View -->
+              <div id="res-tab-body" class="res-pane-section active">
+                <div class="res-body-controls">
+                  <label><input type="radio" name="res-view-format" value="pretty" checked> Pretty</label>
+                  <label><input type="radio" name="res-view-format" value="raw"> Raw</label>
+                  <label><input type="radio" name="res-view-format" value="preview"> HTML Preview</label>
+                </div>
+                <textarea id="res-body-text" class="res-textarea" readonly placeholder="Response body will appear here after sending request..."></textarea>
+                <iframe id="res-body-iframe" class="res-preview-frame" style="display:none;"></iframe>
+              </div>
+
+              <!-- Response Headers View -->
+              <div id="res-tab-headers" class="res-pane-section">
+                <div id="res-headers-table" class="res-headers-list">
+                  <div class="panel-hint">No response received yet.</div>
+                </div>
+              </div>
+
+              <!-- Test & Assertion Results View -->
+              <div id="res-tab-tests" class="res-pane-section">
+                <div class="test-results-summary" id="res-test-summary-bar">
+                  <span>No assertions or tests executed yet.</span>
+                </div>
+                <div id="res-test-items-list" class="test-items-list">
+                  <!-- Dynamically rendered pass/fail rows -->
+                </div>
+              </div>
+
+              <!-- Console Logs View -->
+              <div id="res-tab-console" class="res-pane-section">
+                <div id="res-console-logs" class="res-console-box">
+                  <div class="panel-hint">No logs recorded.</div>
+                </div>
+              </div>
+
+              <!-- Bruno (.bru) Live Preview -->
+              <div id="res-tab-bru-preview" class="res-pane-section">
+                <textarea id="res-bru-preview-text" class="res-textarea" readonly></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 24. YAML <-> JSON Tab -->
+        <section id="yaml-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="yaml-to-json-btn" class="btn btn-primary">YAML ➔ JSON</button>
+            <button id="json-to-yaml-btn" class="btn btn-secondary">JSON ➔ YAML</button>
+            <button id="yaml-clear-btn" class="btn btn-ghost">Clear</button>
+            <button id="yaml-copy-btn" class="btn btn-ghost">Copy Output</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Input (YAML or JSON)</label>
+              <textarea id="yaml-input" placeholder="server:&#10;  port: 8080&#10;  host: localhost&#10;enabled: true"></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Converted Output</label>
+              <textarea id="yaml-output" readonly placeholder="Output will appear here..."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 25. JSON Schema Validator Tab -->
+        <section id="schema-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="schema-validate-btn" class="btn btn-primary">Validate JSON Against Schema</button>
+            <button id="schema-sample-btn" class="btn btn-secondary">Load Sample</button>
+            <button id="schema-clear-btn" class="btn btn-ghost">Clear</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>JSON Data Payload</label>
+              <textarea id="schema-data-input" placeholder='{\n  "id": 1,\n  "name": "Production Server",\n  "active": true\n}'></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>JSON Schema Definition</label>
+              <textarea id="schema-def-input" placeholder='{\n  "type": "object",\n  "required": ["id", "name"],\n  "properties": {\n    "id": { "type": "integer" },\n    "name": { "type": "string" }\n  }\n}'></textarea>
+            </div>
+          </div>
+          <div id="schema-status-box" class="diff-output-box" style="margin-top: 10px; max-height: 140px;">
+            <div class="panel-hint">Click 'Validate' to check data conformity.</div>
+          </div>
+        </section>
+
+        <!-- 26. Chmod Calculator Tab -->
+        <section id="chmod-tab" class="tab-pane">
+          <div class="toolbar">
+            <input type="text" id="chmod-input" value="755" placeholder="Enter Octal (755) or Symbolic (rwxr-xr-x)..." class="input-inline">
+            <button id="chmod-calc-btn" class="btn btn-primary">Calculate Permissions</button>
+          </div>
+          <div class="results-card">
+            <div class="hash-row"><span>Octal Code:</span><input type="text" readonly id="chmod-octal" style="font-size: 16px; font-weight: bold; color: var(--accent-color);"></div>
+            <div class="hash-row"><span>Symbolic:</span><input type="text" readonly id="chmod-symbolic" style="font-family: monospace;"></div>
+            <div class="hash-row"><span>Shell Command:</span><input type="text" readonly id="chmod-command" style="font-family: monospace; color: var(--success-color);"></div>
+          </div>
+          <div style="margin-top: 16px; background: var(--bg-pane); padding: 14px; border: 1px solid var(--border-color); border-radius: 6px;">
+            <strong style="color: var(--text-light); font-size: 13px; display: block; margin-bottom: 8px;">Permission Matrix</strong>
+            <div style="display: flex; gap: 30px; font-size: 13px;">
+              <div id="chmod-user-box">
+                <div style="font-weight: 600; color: var(--accent-color); margin-bottom: 4px;">User (Owner)</div>
+                <label><input type="checkbox" id="perm-ur" checked> Read (4)</label><br>
+                <label><input type="checkbox" id="perm-uw" checked> Write (2)</label><br>
+                <label><input type="checkbox" id="perm-ux" checked> Execute (1)</label>
+              </div>
+              <div id="chmod-group-box">
+                <div style="font-weight: 600; color: var(--accent-color); margin-bottom: 4px;">Group</div>
+                <label><input type="checkbox" id="perm-gr" checked> Read (4)</label><br>
+                <label><input type="checkbox" id="perm-gw"> Write (2)</label><br>
+                <label><input type="checkbox" id="perm-gx" checked> Execute (1)</label>
+              </div>
+              <div id="chmod-other-box">
+                <div style="font-weight: 600; color: var(--accent-color); margin-bottom: 4px;">Others</div>
+                <label><input type="checkbox" id="perm-or" checked> Read (4)</label><br>
+                <label><input type="checkbox" id="perm-ow"> Write (2)</label><br>
+                <label><input type="checkbox" id="perm-ox" checked> Execute (1)</label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 27. .env <-> JSON Tab -->
+        <section id="env-tab" class="tab-pane">
+          <div class="toolbar">
+            <button id="env-to-json-btn" class="btn btn-primary">.env ➔ JSON</button>
+            <button id="json-to-env-btn" class="btn btn-secondary">JSON ➔ .env</button>
+            <button id="env-clear-btn" class="btn btn-ghost">Clear</button>
+            <button id="env-copy-btn" class="btn btn-ghost">Copy Output</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Input (.env or JSON)</label>
+              <textarea id="env-input" placeholder="PORT=3000&#10;NODE_ENV=production&#10;DATABASE_URL=postgres://user:pass@localhost:5432/mydb&#10;API_KEY=secret_key_123"></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Converted Output</label>
+              <textarea id="env-output" readonly placeholder="Output will appear here..."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 28. Quick Code Minifier Tab -->
+        <section id="minifier-tab" class="tab-pane">
+          <div class="toolbar">
+            <label style="font-size: 13px; color: var(--text-light); margin-right: 4px;">Language:</label>
+            <select id="minifier-lang" class="input-inline" style="width: 140px;">
+              <option value="javascript">JavaScript</option>
+              <option value="css">CSS</option>
+              <option value="html">HTML</option>
+            </select>
+            <button id="minifier-run-btn" class="btn btn-primary">Minify Code</button>
+            <button id="minifier-copy-btn" class="btn btn-secondary">Copy Minified</button>
+            <button id="minifier-clear-btn" class="btn btn-ghost">Clear</button>
+          </div>
+          <div class="editor-split">
+            <div class="editor-pane">
+              <label>Source Code</label>
+              <textarea id="minifier-input" placeholder="Paste unminified JavaScript, CSS, or HTML code here..."></textarea>
+            </div>
+            <div class="editor-pane">
+              <label>Minified Result</label>
+              <textarea id="minifier-output" readonly placeholder="Minified code will appear here..."></textarea>
+            </div>
+          </div>
+          <div id="minifier-stats-bar" class="status-bar" style="margin-top: 10px;"></div>
         </section>
       </div>
     </main>

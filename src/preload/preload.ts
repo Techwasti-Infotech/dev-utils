@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { PasswordOptions } from '../shared/utils/engine';
+import { RestApiRequest } from '../shared/utils/restClientEngine';
 
 export const api = {
   json: {
@@ -80,6 +81,31 @@ export const api = {
   },
   url: {
     parseQuery: (urlStr: string) => ipcRenderer.invoke('url:parseQuery', urlStr),
+  },
+  yaml: {
+    jsonToYaml: (jsonStr: string) => ipcRenderer.invoke('yaml:jsonToYaml', jsonStr),
+    yamlToJson: (yamlStr: string) => ipcRenderer.invoke('yaml:yamlToJson', yamlStr),
+  },
+  schema: {
+    validate: (dataJson: string, schemaJson: string) => ipcRenderer.invoke('schema:validate', dataJson, schemaJson),
+  },
+  chmod: {
+    calculate: (input: string) => ipcRenderer.invoke('chmod:calculate', input),
+  },
+  env: {
+    parse: (envStr: string) => ipcRenderer.invoke('env:parse', envStr),
+    jsonToEnv: (jsonStr: string) => ipcRenderer.invoke('env:jsonToEnv', jsonStr),
+  },
+  minify: {
+    code: (code: string, lang: 'javascript' | 'css' | 'html') => ipcRenderer.invoke('minify:code', code, lang),
+  },
+  rest: {
+    execute: (request: RestApiRequest, envVars: Record<string, string> = {}) =>
+      ipcRenderer.invoke('rest:execute', request, envVars),
+    parseBru: (bruContent: string) => ipcRenderer.invoke('rest:parseBru', bruContent),
+    serializeBru: (request: RestApiRequest) => ipcRenderer.invoke('rest:serializeBru', request),
+    generateCurl: (request: RestApiRequest, envVars: Record<string, string> = {}) =>
+      ipcRenderer.invoke('rest:generateCurl', request, envVars)
   }
 };
 

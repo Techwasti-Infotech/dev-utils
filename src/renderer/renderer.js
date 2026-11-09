@@ -41,6 +41,10 @@ const toolsMeta = {
     title: 'Regex Tester & Debugger',
     desc: 'Test and inspect regular expressions with match groups and occurrences.'
   },
+  'rest-tab': {
+    title: 'REST Client & API Testing (Bruno-compatible)',
+    desc: 'Feature-rich HTTP/REST testing tool with collections, environments, assertions, and .bru file support.'
+  },
   'diff-tab': {
     title: 'Text Diff & Comparison',
     desc: 'Compare two text snippets side-by-side with color-coded additions and deletions.'
@@ -88,6 +92,26 @@ const toolsMeta = {
   'url-tab': {
     title: 'URL & Query String Parser',
     desc: 'Decompose URLs into protocol, host, port, path, hash, and parsed key-value parameters.'
+  },
+  'yaml-tab': {
+    title: 'YAML ↔ JSON Converter',
+    desc: 'Bidirectional translation and formatting between YAML configuration files and JSON.'
+  },
+  'schema-tab': {
+    title: 'JSON Schema Validator',
+    desc: 'Verify JSON objects against JSON Schema definitions with error reporting.'
+  },
+  'chmod-tab': {
+    title: 'Unix Chmod Permissions Calculator',
+    desc: 'Calculate octal codes, symbolic notation, and interactive permission flags.'
+  },
+  'env-tab': {
+    title: '.env ↔ JSON Environment Config',
+    desc: 'Convert dotenv configuration files to structured JSON objects and back.'
+  },
+  'minifier-tab': {
+    title: 'Quick Code Minifier (JS / CSS / HTML)',
+    desc: 'Remove comments, whitespace, and collapse production scripts and stylesheets.'
   }
 };
 
@@ -115,6 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
   setupColorTool();
   setupLoremTool();
   setupUrlTool();
+  setupRestApiTool();
+  setupYamlTool();
+  setupSchemaTool();
+  setupChmodTool();
+  setupEnvTool();
+  setupMinifierTool();
 });
 
 // Navigation & Tab Switching
@@ -672,3 +702,718 @@ function setupUrlTool() {
     }
   };
 }
+
+// =========================================================================
+// 23. REST API Testing Tool (Bruno-compatible)
+// =========================================================================
+function setupRestApiTool() {
+  const methodSelect = document.getElementById('rest-method');
+  const urlInput = document.getElementById('rest-url');
+  const sendBtn = document.getElementById('rest-send-btn');
+  const saveBruBtn = document.getElementById('rest-save-bru-btn');
+  const importBruBtn = document.getElementById('rest-import-bru-btn');
+  const copyCurlBtn = document.getElementById('rest-copy-curl-btn');
+
+  // Sub-tabs on request side
+  const subTabs = document.querySelectorAll('.rest-sub-tab');
+  const tabSections = document.querySelectorAll('.rest-tab-section');
+
+  subTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      subTabs.forEach(t => t.classList.remove('active'));
+      tabSections.forEach(s => s.classList.remove('active'));
+
+      tab.classList.add('active');
+      const targetId = `rest-tab-${tab.getAttribute('data-sub')}`;
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) targetSection.classList.add('active');
+    });
+  });
+
+  // Response sub-tabs
+  const resTabs = document.querySelectorAll('.res-sub-tab');
+  const resSections = document.querySelectorAll('.res-pane-section');
+
+  resTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      resTabs.forEach(t => t.classList.remove('active'));
+      resSections.forEach(s => s.classList.remove('active'));
+
+      tab.classList.add('active');
+      const targetId = tab.getAttribute('data-res-tab');
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) targetSection.classList.add('active');
+    });
+  });
+
+  // Environment and variables
+  const envSelect = document.getElementById('rest-env-select');
+  const envEditBtn = document.getElementById('rest-env-edit-btn');
+  const envPanel = document.getElementById('rest-env-panel');
+  const envCloseBtn = document.getElementById('rest-env-close-btn');
+  const envVarsInput = document.getElementById('rest-env-vars-input');
+  const envSaveVarsBtn = document.getElementById('rest-env-save-vars-btn');
+
+  const environments = {
+    none: {},
+    local: { baseUrl: 'http://127.0.0.1:3000', token: 'local-test-token', userId: '1' },
+    staging: { baseUrl: 'https://staging.api.example.com', token: 'staging-token-xyz', userId: '10' },
+    production: { baseUrl: 'https://api.example.com', token: 'prod-token', userId: '100' },
+    custom: { baseUrl: 'https://jsonplaceholder.typicode.com', userId: '1' }
+  };
+
+  let activeEnvVars = { ...environments.none };
+
+  function refreshEnvDisplay() {
+    const lines = Object.entries(activeEnvVars).map(([k, v]) => `${k}: ${v}`);
+    envVarsInput.value = lines.join('\n');
+  }
+
+  envSelect.addEventListener('change', () => {
+    const selected = envSelect.value;
+    activeEnvVars = { ...(environments[selected] || {}) };
+    refreshEnvDisplay();
+  });
+
+  envEditBtn.addEventListener('click', () => {
+    envPanel.style.display = envPanel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  envCloseBtn.addEventListener('click', () => {
+    envPanel.style.display = 'none';
+  });
+
+  envSaveVarsBtn.addEventListener('click', () => {
+    const lines = envVarsInput.value.split('\n');
+    activeEnvVars = {};
+    for (const line of lines) {
+      const idx = line.indexOf(':');
+      if (idx > 0) {
+        activeEnvVars[line.substring(0, idx).trim()] = line.substring(idx + 1).trim();
+      }
+    }
+    environments['custom'] = { ...activeEnvVars };
+    envSelect.value = 'custom';
+    envPanel.style.display = 'none';
+  });
+
+  // Parameter table management
+  const paramsList = document.getElementById('rest-params-list');
+  const addParamBtn = document.getElementById('rest-add-param-btn');
+
+  function createKvRow(container, key = '', val = '', enabled = true) {
+    const row = document.createElement('div');
+    row.className = 'kv-row';
+    row.innerHTML = `
+      <input type="checkbox" ${enabled ? 'checked' : ''} class="kv-enable">
+      <input type="text" placeholder="Key" value="${key}" class="kv-key">
+      <input type="text" placeholder="Value" value="${val}" class="kv-val">
+      <button class="btn-icon-del" title="Delete">✕</button>
+    `;
+
+    row.querySelector('.btn-icon-del').onclick = () => row.remove();
+    container.appendChild(row);
+  }
+
+  addParamBtn.onclick = () => createKvRow(paramsList);
+
+  // Initialize sample parameter
+  createKvRow(paramsList, 'userId', '{{userId}}', false);
+
+  // Header table management
+  const headersList = document.getElementById('rest-headers-list');
+  const addHeaderBtn = document.getElementById('rest-add-header-btn');
+  addHeaderBtn.onclick = () => createKvRow(headersList);
+
+  // Initialize common headers
+  createKvRow(headersList, 'Accept', 'application/json', true);
+  createKvRow(headersList, 'User-Agent', 'DevUtils-Desktop/1.0', true);
+
+  // Auth type toggling
+  const authTypeSelect = document.getElementById('rest-auth-type');
+  const authBearerGroup = document.getElementById('rest-auth-bearer-group');
+  const authBasicGroup = document.getElementById('rest-auth-basic-group');
+  const authApiKeyGroup = document.getElementById('rest-auth-apikey-group');
+
+  authTypeSelect.addEventListener('change', () => {
+    const val = authTypeSelect.value;
+    authBearerGroup.style.display = val === 'bearer' ? 'flex' : 'none';
+    authBasicGroup.style.display = val === 'basic' ? 'flex' : 'none';
+    authApiKeyGroup.style.display = val === 'apikey' ? 'flex' : 'none';
+  });
+
+  // Body formatting button
+  const formatBodyBtn = document.getElementById('rest-format-body-btn');
+  const bodyRaw = document.getElementById('rest-body-raw');
+  formatBodyBtn.onclick = () => {
+    try {
+      const parsed = JSON.parse(bodyRaw.value);
+      bodyRaw.value = JSON.stringify(parsed, null, 2);
+    } catch (e) {
+      alert('Invalid JSON body');
+    }
+  };
+
+  // Assertions and test snippets
+  const addAssertBtn = document.getElementById('rest-add-assert-example-btn');
+  const assertionsInput = document.getElementById('rest-assertions-input');
+  addAssertBtn.onclick = () => {
+    assertionsInput.value = `res.status: eq 200\nres.responseTime: lte 2500\nres.body: isDefined`;
+  };
+
+  const addTestSnippetBtn = document.getElementById('rest-add-test-snippet-btn');
+  const testScriptInput = document.getElementById('rest-test-script');
+  addTestSnippetBtn.onclick = () => {
+    testScriptInput.value = `test("Status is 200 OK", () => {\n  expect(res.status).toBe(200);\n});\ntest("Response time is acceptable", () => {\n  expect(res.responseTime).toBeLessThan(3000);\n});\nconsole.log("Response status: " + res.status);`;
+  };
+
+  // Helper to extract KeyValuePairs from list container
+  function extractKvList(container) {
+    const rows = container.querySelectorAll('.kv-row');
+    const items = [];
+    rows.forEach(r => {
+      const enabled = r.querySelector('.kv-enable').checked;
+      const key = r.querySelector('.kv-key').value.trim();
+      const value = r.querySelector('.kv-val').value.trim();
+      if (key) {
+        items.push({ key, value, enabled });
+      }
+    });
+    return items;
+  }
+
+  // Construct RestApiRequest object from UI state
+  function getRequestFromUI() {
+    const method = methodSelect.value;
+    const url = urlInput.value.trim();
+    const params = extractKvList(paramsList);
+    const headers = extractKvList(headersList);
+
+    const authType = authTypeSelect.value;
+    const auth = { type: authType };
+    if (authType === 'bearer') {
+      auth.bearer = { token: document.getElementById('rest-auth-bearer-token').value.trim() };
+    } else if (authType === 'basic') {
+      auth.basic = {
+        username: document.getElementById('rest-auth-basic-user').value.trim(),
+        password: document.getElementById('rest-auth-basic-pass').value.trim()
+      };
+    } else if (authType === 'apikey') {
+      auth.apiKey = {
+        key: document.getElementById('rest-auth-apikey-key').value.trim(),
+        value: document.getElementById('rest-auth-apikey-val').value.trim(),
+        addTo: document.getElementById('rest-auth-apikey-place').value
+      };
+    }
+
+    const bodyTypeRadio = document.querySelector('input[name="rest-body-type"]:checked');
+    const bodyType = bodyTypeRadio ? bodyTypeRadio.value : 'none';
+    const body = {
+      type: bodyType,
+      raw: bodyRaw.value
+    };
+
+    const assertions = assertionsInput.value.split('\n').map(s => s.trim()).filter(Boolean);
+    const tests = testScriptInput.value;
+    const preRequestScript = document.getElementById('rest-prescript-input').value;
+
+    return {
+      method,
+      url,
+      params,
+      headers,
+      auth,
+      body,
+      assertions,
+      tests,
+      preRequestScript
+    };
+  }
+
+  // Apply RestApiRequest object to UI
+  function populateUIFromRequest(req) {
+    if (req.method) methodSelect.value = req.method;
+    if (req.url) urlInput.value = req.url;
+
+    // Params
+    paramsList.innerHTML = '';
+    if (req.params && req.params.length > 0) {
+      req.params.forEach(p => createKvRow(paramsList, p.key, p.value, p.enabled !== false));
+    }
+
+    // Headers
+    headersList.innerHTML = '';
+    if (req.headers && req.headers.length > 0) {
+      req.headers.forEach(h => createKvRow(headersList, h.key, h.value, h.enabled !== false));
+    }
+
+    // Auth
+    if (req.auth) {
+      authTypeSelect.value = req.auth.type;
+      authTypeSelect.dispatchEvent(new Event('change'));
+      if (req.auth.type === 'bearer' && req.auth.bearer) {
+        document.getElementById('rest-auth-bearer-token').value = req.auth.bearer.token || '';
+      } else if (req.auth.type === 'basic' && req.auth.basic) {
+        document.getElementById('rest-auth-basic-user').value = req.auth.basic.username || '';
+        document.getElementById('rest-auth-basic-pass').value = req.auth.basic.password || '';
+      } else if (req.auth.type === 'apikey' && req.auth.apiKey) {
+        document.getElementById('rest-auth-apikey-key').value = req.auth.apiKey.key || '';
+        document.getElementById('rest-auth-apikey-val').value = req.auth.apiKey.value || '';
+        document.getElementById('rest-auth-apikey-place').value = req.auth.apiKey.addTo || 'header';
+      }
+    }
+
+    // Body
+    if (req.body) {
+      const radio = document.querySelector(`input[name="rest-body-type"][value="${req.body.type || 'none'}"]`);
+      if (radio) radio.checked = true;
+      bodyRaw.value = req.body.raw || '';
+    }
+
+    // Assertions & Scripts
+    if (req.assertions) {
+      assertionsInput.value = req.assertions.join('\n');
+    }
+    if (req.tests) {
+      testScriptInput.value = req.tests;
+    }
+    if (req.preRequestScript) {
+      document.getElementById('rest-prescript-input').value = req.preRequestScript;
+    }
+  }
+
+  // Send Request Event Handler
+  sendBtn.addEventListener('click', async () => {
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<span>⏳ Sending...</span>';
+
+    const req = getRequestFromUI();
+    const quickTag = document.getElementById('rest-quick-stats');
+    quickTag.textContent = 'Request in progress...';
+
+    const statusBadge = document.getElementById('res-status-badge');
+    const timeBadge = document.getElementById('res-time-badge');
+    const sizeBadge = document.getElementById('res-size-badge');
+    const bodyText = document.getElementById('res-body-text');
+    const headersTable = document.getElementById('res-headers-table');
+    const testItemsList = document.getElementById('res-test-items-list');
+    const testSummaryBar = document.getElementById('res-test-summary-bar');
+    const consoleLogsBox = document.getElementById('res-console-logs');
+    const bruPreview = document.getElementById('res-bru-preview-text');
+
+    try {
+      const response = await window.devUtilsAPI.rest.execute(req, activeEnvVars);
+
+      // Status badge
+      statusBadge.textContent = `Status: ${response.status} ${response.statusText}`;
+      statusBadge.className = 'res-badge';
+      if (response.status >= 200 && response.status < 300) {
+        statusBadge.classList.add('res-badge-2xx');
+      } else if (response.status >= 300 && response.status < 400) {
+        statusBadge.classList.add('res-badge-3xx');
+      } else {
+        statusBadge.classList.add('res-badge-4xx');
+      }
+
+      timeBadge.textContent = `Time: ${response.timeMs} ms`;
+      sizeBadge.textContent = `Size: ${response.sizeBytes} B`;
+      quickTag.textContent = `${response.status} ${response.statusText} (${response.timeMs}ms)`;
+
+      // Body formatting
+      let displayBody = response.body;
+      if (response.parsedBody) {
+        displayBody = JSON.stringify(response.parsedBody, null, 2);
+      }
+      bodyText.value = displayBody;
+
+      // HTML Preview if applicable
+      const previewFrame = document.getElementById('res-body-iframe');
+      if (response.body.includes('<html') || response.headers['content-type']?.includes('html')) {
+        previewFrame.srcdoc = response.body;
+      }
+
+      // Headers tab
+      headersTable.innerHTML = '';
+      const headerEntries = Object.entries(response.headers || {});
+      document.getElementById('res-headers-count').textContent = headerEntries.length;
+      if (headerEntries.length === 0) {
+        headersTable.innerHTML = '<div class="panel-hint">No headers returned.</div>';
+      } else {
+        for (const [k, v] of headerEntries) {
+          const item = document.createElement('div');
+          item.className = 'res-header-item';
+          item.innerHTML = `<span class="res-header-name">${k}</span><span class="res-header-val">${Array.isArray(v) ? v.join(', ') : v}</span>`;
+          headersTable.appendChild(item);
+        }
+      }
+
+      // Assertions & Tests Results
+      testItemsList.innerHTML = '';
+      const totalAssertions = (response.assertions || []).length;
+      const totalScriptTests = (response.tests || []).length;
+      const totalTestsCount = totalAssertions + totalScriptTests;
+
+      let passedCount = 0;
+
+      // 1. Render declarative assertions
+      if (response.assertions) {
+        response.assertions.forEach(a => {
+          if (a.passed) passedCount++;
+          const row = document.createElement('div');
+          row.className = `test-item-row ${a.passed ? 'test-pass' : 'test-fail'}`;
+          row.innerHTML = `
+            <span><strong>[Assert]</strong> ${a.expression}</span>
+            <span>${a.passed ? '✓ PASSED' : `✗ FAILED: ${a.error || `Expected ${JSON.stringify(a.expected)}, got ${JSON.stringify(a.actual)}`}`}</span>
+          `;
+          testItemsList.appendChild(row);
+        });
+      }
+
+      // 2. Render script test assertions
+      if (response.tests) {
+        response.tests.forEach(t => {
+          if (t.passed) passedCount++;
+          const row = document.createElement('div');
+          row.className = `test-item-row ${t.passed ? 'test-pass' : 'test-fail'}`;
+          row.innerHTML = `
+            <span><strong>[Test]</strong> ${t.name}</span>
+            <span>${t.passed ? '✓ PASSED' : `✗ FAILED: ${t.error}`}</span>
+          `;
+          testItemsList.appendChild(row);
+        });
+      }
+
+      document.getElementById('res-tests-count').textContent = totalTestsCount;
+      if (totalTestsCount === 0) {
+        testSummaryBar.innerHTML = '<span>No assertions or test scripts configured.</span>';
+      } else {
+        const isAllPass = passedCount === totalTestsCount;
+        testSummaryBar.innerHTML = `<span style="color: ${isAllPass ? 'var(--success-color)' : 'var(--error-color)'};">
+          ${passedCount} of ${totalTestsCount} tests passed (${Math.round((passedCount / totalTestsCount) * 100)}%)
+        </span>`;
+      }
+
+      // Console logs
+      consoleLogsBox.innerHTML = '';
+      const logs = response.consoleLogs || [];
+      document.getElementById('res-console-count').textContent = logs.length;
+      if (logs.length === 0) {
+        consoleLogsBox.innerHTML = '<div class="panel-hint">No logs recorded.</div>';
+      } else {
+        logs.forEach(log => {
+          const l = document.createElement('div');
+          l.className = 'console-log-line';
+          l.textContent = log;
+          consoleLogsBox.appendChild(l);
+        });
+      }
+
+      // Update .bru preview
+      const bruString = await window.devUtilsAPI.rest.serializeBru(req);
+      bruPreview.value = bruString;
+
+    } catch (err) {
+      statusBadge.textContent = 'Status: Error';
+      statusBadge.className = 'res-badge res-badge-err';
+      bodyText.value = `Error executing request:\n${err.message || String(err)}`;
+      quickTag.textContent = 'Request Failed';
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '<span>▶ Send</span>';
+    }
+  });
+
+  // Export to .bru file
+  saveBruBtn.addEventListener('click', async () => {
+    const req = getRequestFromUI();
+    const bruString = await window.devUtilsAPI.rest.serializeBru(req);
+    const blob = new Blob([bruString], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${req.name || 'request'}.bru`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // Import from .bru file
+  importBruBtn.addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.bru,.txt';
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const text = await file.text();
+        const parsed = await window.devUtilsAPI.rest.parseBru(text);
+        populateUIFromRequest(parsed);
+      }
+    };
+    fileInput.click();
+  });
+
+  // Copy as cURL
+  copyCurlBtn.addEventListener('click', async () => {
+    const req = getRequestFromUI();
+    const curl = await window.devUtilsAPI.rest.generateCurl(req, activeEnvVars);
+    navigator.clipboard.writeText(curl);
+    copyCurlBtn.innerHTML = '<span>✓ Copied!</span>';
+    setTimeout(() => {
+      copyCurlBtn.innerHTML = '<span>📋 cURL</span>';
+    }, 1500);
+  });
+
+  // Copy Response Body
+  document.getElementById('res-copy-body-btn').onclick = () => {
+    const text = document.getElementById('res-body-text').value;
+    navigator.clipboard.writeText(text);
+  };
+
+  // Clear Response
+  document.getElementById('res-clear-btn').onclick = () => {
+    document.getElementById('res-body-text').value = '';
+    document.getElementById('res-status-badge').textContent = 'Status: --';
+    document.getElementById('res-status-badge').className = 'res-badge res-badge-idle';
+    document.getElementById('res-time-badge').textContent = 'Time: -- ms';
+    document.getElementById('res-size-badge').textContent = 'Size: -- B';
+    document.getElementById('res-headers-table').innerHTML = '<div class="panel-hint">No response received yet.</div>';
+    document.getElementById('res-test-items-list').innerHTML = '';
+    document.getElementById('res-test-summary-bar').innerHTML = '<span>No assertions or tests executed yet.</span>';
+    document.getElementById('res-console-logs').innerHTML = '<div class="panel-hint">No logs recorded.</div>';
+  };
+
+  // Format view switch (pretty / raw / preview)
+  const formatRadios = document.querySelectorAll('input[name="res-view-format"]');
+  formatRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      const val = radio.value;
+      const bodyTextarea = document.getElementById('res-body-text');
+      const previewFrame = document.getElementById('res-body-iframe');
+
+      if (val === 'preview') {
+        bodyTextarea.style.display = 'none';
+        previewFrame.style.display = 'block';
+      } else {
+        bodyTextarea.style.display = 'block';
+        previewFrame.style.display = 'none';
+      }
+    });
+  });
+
+  // Collections Switcher (Demo presets)
+  const collSelect = document.getElementById('rest-collection-select');
+  collSelect.addEventListener('change', () => {
+    if (collSelect.value === 'demo-todos') {
+      populateUIFromRequest({
+        name: 'Get Todo Item',
+        method: 'GET',
+        url: 'https://jsonplaceholder.typicode.com/todos/1',
+        params: [],
+        headers: [
+          { key: 'Accept', value: 'application/json', enabled: true }
+        ],
+        assertions: [
+          'res.status: eq 200',
+          'res.body.id: eq 1',
+          'res.body.title: isDefined'
+        ],
+        tests: `test("Status is 200 OK", () => {\n  expect(res.status).toBe(200);\n});`
+      });
+    }
+  });
+}
+
+// 24. YAML ↔ JSON Tool
+function setupYamlTool() {
+  const input = document.getElementById('yaml-input');
+  const output = document.getElementById('yaml-output');
+
+  document.getElementById('yaml-to-json-btn').onclick = async () => {
+    const res = await window.devUtilsAPI.yaml.yamlToJson(input.value);
+    if (res.success) {
+      output.value = res.result;
+    } else {
+      output.value = `Error: ${res.error}`;
+    }
+  };
+
+  document.getElementById('json-to-yaml-btn').onclick = async () => {
+    const res = await window.devUtilsAPI.yaml.jsonToYaml(input.value);
+    if (res.success) {
+      output.value = res.result;
+    } else {
+      output.value = `Error: ${res.error}`;
+    }
+  };
+
+  document.getElementById('yaml-clear-btn').onclick = () => {
+    input.value = '';
+    output.value = '';
+  };
+
+  document.getElementById('yaml-copy-btn').onclick = () => {
+    navigator.clipboard.writeText(output.value);
+  };
+}
+
+// 25. JSON Schema Validator Tool
+function setupSchemaTool() {
+  const dataInput = document.getElementById('schema-data-input');
+  const defInput = document.getElementById('schema-def-input');
+  const statusBox = document.getElementById('schema-status-box');
+
+  document.getElementById('schema-validate-btn').onclick = async () => {
+    const res = await window.devUtilsAPI.schema.validate(dataInput.value, defInput.value);
+    if (res.valid) {
+      statusBox.innerHTML = '<span style="color: var(--success-color); font-weight: bold;">✓ Schema Validation Passed: Payload conforms to JSON Schema specifications.</span>';
+    } else {
+      const errList = res.errors.map(e => `• ${e}`).join('<br>');
+      statusBox.innerHTML = `<span style="color: var(--error-color); font-weight: bold;">✗ Validation Errors (${res.errors.length}):</span><div style="margin-top:6px; color: var(--text-light);">${errList}</div>`;
+    }
+  };
+
+  document.getElementById('schema-sample-btn').onclick = () => {
+    dataInput.value = JSON.stringify({
+      id: 101,
+      name: "API Gateway",
+      active: true,
+      port: 8080,
+      tags: ["microservices", "proxy"]
+    }, null, 2);
+
+    defInput.value = JSON.stringify({
+      type: "object",
+      required: ["id", "name", "port"],
+      properties: {
+        id: { type: "integer", minimum: 1 },
+        name: { type: "string", minLength: 3 },
+        active: { type: "boolean" },
+        port: { type: "integer", minimum: 1024, maximum: 65535 },
+        tags: { type: "array", items: { type: "string" } }
+      }
+    }, null, 2);
+  };
+
+  document.getElementById('schema-clear-btn').onclick = () => {
+    dataInput.value = '';
+    defInput.value = '';
+    statusBox.innerHTML = '<div class="panel-hint">Cleared.</div>';
+  };
+}
+
+// 26. Chmod Calculator Tool
+function setupChmodTool() {
+  const input = document.getElementById('chmod-input');
+  const octal = document.getElementById('chmod-octal');
+  const symbolic = document.getElementById('chmod-symbolic');
+  const command = document.getElementById('chmod-command');
+
+  const pUr = document.getElementById('perm-ur');
+  const pUw = document.getElementById('perm-uw');
+  const pUx = document.getElementById('perm-ux');
+  const pGr = document.getElementById('perm-gr');
+  const pGw = document.getElementById('perm-gw');
+  const pGx = document.getElementById('perm-gx');
+  const pOr = document.getElementById('perm-or');
+  const pOw = document.getElementById('perm-ow');
+  const pOx = document.getElementById('perm-ox');
+
+  async function updateFromInput(val) {
+    const res = await window.devUtilsAPI.chmod.calculate(val);
+    octal.value = res.octal;
+    symbolic.value = res.symbolic;
+    command.value = res.command;
+
+    pUr.checked = res.breakdown.user.read;
+    pUw.checked = res.breakdown.user.write;
+    pUx.checked = res.breakdown.user.execute;
+
+    pGr.checked = res.breakdown.group.read;
+    pGw.checked = res.breakdown.group.write;
+    pGx.checked = res.breakdown.group.execute;
+
+    pOr.checked = res.breakdown.others.read;
+    pOw.checked = res.breakdown.others.write;
+    pOx.checked = res.breakdown.others.execute;
+  }
+
+  function updateFromCheckboxes() {
+    const u = (pUr.checked ? 4 : 0) + (pUw.checked ? 2 : 0) + (pUx.checked ? 1 : 0);
+    const g = (pGr.checked ? 4 : 0) + (pGw.checked ? 2 : 0) + (pGx.checked ? 1 : 0);
+    const o = (pOr.checked ? 4 : 0) + (pOw.checked ? 2 : 0) + (pOx.checked ? 1 : 0);
+    const oct = `${u}${g}${o}`;
+    input.value = oct;
+    updateFromInput(oct);
+  }
+
+  document.getElementById('chmod-calc-btn').onclick = () => updateFromInput(input.value);
+  input.oninput = () => updateFromInput(input.value);
+
+  [pUr, pUw, pUx, pGr, pGw, pGx, pOr, pOw, pOx].forEach(cb => {
+    cb.onchange = updateFromCheckboxes;
+  });
+
+  // initial load
+  updateFromInput('755');
+}
+
+// 27. .env <-> JSON Tool
+function setupEnvTool() {
+  const input = document.getElementById('env-input');
+  const output = document.getElementById('env-output');
+
+  document.getElementById('env-to-json-btn').onclick = async () => {
+    const res = await window.devUtilsAPI.env.parse(input.value);
+    output.value = JSON.stringify(res, null, 2);
+  };
+
+  document.getElementById('json-to-env-btn').onclick = async () => {
+    const res = await window.devUtilsAPI.env.jsonToEnv(input.value);
+    if (res.success) {
+      output.value = res.result;
+    } else {
+      output.value = `Error: ${res.error}`;
+    }
+  };
+
+  document.getElementById('env-clear-btn').onclick = () => {
+    input.value = '';
+    output.value = '';
+  };
+
+  document.getElementById('env-copy-btn').onclick = () => {
+    navigator.clipboard.writeText(output.value);
+  };
+}
+
+// 28. Quick Code Minifier Tool
+function setupMinifierTool() {
+  const langSelect = document.getElementById('minifier-lang');
+  const input = document.getElementById('minifier-input');
+  const output = document.getElementById('minifier-output');
+  const statsBar = document.getElementById('minifier-stats-bar');
+
+  document.getElementById('minifier-run-btn').onclick = async () => {
+    const orig = input.value;
+    const min = await window.devUtilsAPI.minify.code(orig, langSelect.value);
+    output.value = min;
+
+    const origBytes = new Blob([orig]).size;
+    const minBytes = new Blob([min]).size;
+    const saved = origBytes > 0 ? Math.round(((origBytes - minBytes) / origBytes) * 100) : 0;
+
+    statsBar.innerHTML = `<span style="color: var(--success-color);">Original: ${origBytes} bytes | Minified: ${minBytes} bytes | Saved: ${saved}%</span>`;
+  };
+
+  document.getElementById('minifier-copy-btn').onclick = () => {
+    navigator.clipboard.writeText(output.value);
+  };
+
+  document.getElementById('minifier-clear-btn').onclick = () => {
+    input.value = '';
+    output.value = '';
+    statsBar.innerHTML = '';
+  };
+}
+
+

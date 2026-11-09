@@ -33,8 +33,22 @@ import {
   markdownToHtml,
   convertColor,
   generateLoremIpsum,
-  parseUrlQuery
+  parseUrlQuery,
+  jsonToYaml,
+  yamlToJson,
+  validateJsonSchema,
+  calculateChmod,
+  parseEnvFile,
+  jsonToEnvFile,
+  minifyCode
 } from '../shared/utils/engine';
+import {
+  RestApiRequest,
+  executeRestRequest,
+  parseBruFile,
+  serializeToBruFile,
+  generateCurlFromRequest
+} from '../shared/utils/restClientEngine';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -110,4 +124,23 @@ function setupIpcHandlers() {
   ipcMain.handle('color:convert', (_, input) => convertColor(input));
   ipcMain.handle('lorem:generate', (_, count) => generateLoremIpsum(count));
   ipcMain.handle('url:parseQuery', (_, urlStr) => parseUrlQuery(urlStr));
+
+  // Additional Developer Utilities handlers
+  ipcMain.handle('yaml:jsonToYaml', (_, jsonStr) => jsonToYaml(jsonStr));
+  ipcMain.handle('yaml:yamlToJson', (_, yamlStr) => yamlToJson(yamlStr));
+  ipcMain.handle('schema:validate', (_, dataJson, schemaJson) => validateJsonSchema(dataJson, schemaJson));
+  ipcMain.handle('chmod:calculate', (_, input) => calculateChmod(input));
+  ipcMain.handle('env:parse', (_, envStr) => parseEnvFile(envStr));
+  ipcMain.handle('env:jsonToEnv', (_, jsonStr) => jsonToEnvFile(jsonStr));
+  ipcMain.handle('minify:code', (_, code, lang) => minifyCode(code, lang));
+
+  // REST API Client & Testing Tool handlers
+  ipcMain.handle('rest:execute', (_, request: RestApiRequest, envVars: Record<string, string>) =>
+    executeRestRequest(request, envVars)
+  );
+  ipcMain.handle('rest:parseBru', (_, bruContent: string) => parseBruFile(bruContent));
+  ipcMain.handle('rest:serializeBru', (_, request: RestApiRequest) => serializeToBruFile(request));
+  ipcMain.handle('rest:generateCurl', (_, request: RestApiRequest, envVars: Record<string, string>) =>
+    generateCurlFromRequest(request, envVars)
+  );
 }

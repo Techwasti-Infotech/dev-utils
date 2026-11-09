@@ -25,11 +25,12 @@ Read the detailed [Security & Compliance Guide](docs/SECURITY_AND_COMPLIANCE.md)
 
 ---
 
-## 🧰 Included Utilities (18 Tools)
+## 🧰 Included Utilities (24 Tools)
 
 | Category | Utility | Description |
 | :--- | :--- | :--- |
 | **Data & Formatting** | **JSON Prettifier & Minifier** | Validate, format (2/4 spaces), and minify payloads with instant error diagnostics. |
+| | **YAML ↔ JSON Converter** | Bidirectional translation and formatting between YAML configuration files and JSON. |
 | | **JSON ↔ CSV Converter** | Transform JSON arrays of objects to CSV spreadsheets and vice-versa. |
 | | **XML Prettifier & Validator** | Indent nested XML documents with syntax inspection. |
 | | **SQL Query Beautifier** | Standardize keyword casing and formatting for complex database queries. |
@@ -38,19 +39,24 @@ Read the detailed [Security & Compliance Guide](docs/SECURITY_AND_COMPLIANCE.md)
 | | **Secure Password Generator** | Cryptographically random passwords with custom symbols, numbers, and length. |
 | **Encoding & Codecs** | **Base64, URL & HTML Codec** | UTF-8 safe encoding and decoding for web tokens, query strings, and markup. |
 | | **Hex ↔ Text Converter** | Bidirectional conversion between raw UTF-8 text and hexadecimal byte strings. |
-| **Testing & QA** | **Regex Tester & Debugger** | Test patterns against sample text with real-time match count and group breakdown. |
+| **Testing & QA** | **REST Client & API Testing (Bruno-compatible)** | Full HTTP/REST test runner with environments, assertions, pre/post scripts, and `.bru` support. |
+| | **JSON Schema Validator** | Validate JSON payloads against JSON Schema definitions with error breakdown. |
+| | **Regex Tester & Debugger** | Test patterns against sample text with real-time match count and group breakdown. |
 | | **Text Diff & Comparison** | Compare expected vs. actual outputs with color-coded unified diff view. |
 | | **UUID & QA Mock Data** | Generate UUID v4/v1 IDs and randomized mock user datasets (JSON) for test scenarios. |
 | | **HTTP Status & Headers** | Instant offline lookup for HTTP status codes (2xx, 3xx, 4xx, 5xx) and RFC meanings. |
+| **DevOps & Environment** | **Unix Chmod Calculator** | Calculate octal codes, symbolic notation, and interactive permission flags. |
+| | **.env ↔ JSON Config** | Bidirectional translation between dotenv environment files and structured JSON. |
+| | **Quick Code Minifier** | Remove whitespace and comments from JavaScript, CSS, and HTML with size savings stats. |
 | **Network & APIs** | **cURL to Code Converter** | Convert cURL commands into JavaScript `fetch` and Python `requests` snippets. |
 | | **CIDR / Subnet Calculator** | Compute IPv4 netmasks, network bounds, broadcast addresses, and usable host counts. |
+| | **URL & Query String Parser** | Decompose URI parts and extract query string parameters into structured JSON. |
 | **Time & Text** | **Unix Timestamp / Epoch** | Convert between Unix epoch seconds/milliseconds and human UTC / Local dates. |
 | | **String Cases & Text Stats** | camelCase, PascalCase, snake_case, kebab-case, word count, line count, and byte size. |
 | | **Cron Expression Explainer** | Translate standard 5-part cron syntax into clear human English. |
 | | **Markdown to HTML Preview** | Offline Markdown parser with live HTML rendering and preview. |
 | | **Lorem Ipsum Text Generator** | Instant multi-paragraph dummy text for UI mockups and testing. |
 | **Web & Styling** | **Color Palette Converter** | Bidirectional converter between HEX, RGB, RGBA, and HSL with interactive swatch. |
-| | **URL & Query String Parser** | Decompose URI parts and extract query string parameters into structured JSON. |
 
 ---
 
