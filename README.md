@@ -6,9 +6,29 @@
 [![Privacy Compliance](https://img.shields.io/badge/Privacy-100%25%20Offline%20Air--Gapped-brightgreen.svg)](docs/SECURITY_AND_COMPLIANCE.md)
 [![Platforms](https://img.shields.io/badge/Platforms-Windows%20%7C%20macOS%20%7C%20Linux-blue.svg)](docs/BUILD_AND_PACKAGING_GUIDE.md)
 
-**DevUtils** is an open-source, air-gapped desktop application engineered for software developers and QA automation engineers. It bundles **18 essential day-to-day utilities** into a fast, privacy-first interface that **never transmits your data over the internet**.
+**DevUtils** is an open-source, air-gapped desktop application engineered for software developers and QA automation engineers. It bundles **24 essential day-to-day utilities** into a fast, privacy-first interface that **never transmits your data over the internet**.
 
 📖 Detailed Reference: Check the [Complete Utilities Catalog & Reference](docs/UTILITIES_CATALOG.md).
+
+---
+
+## 📸 Product Screenshots
+
+| REST Client & Testing (Bruno) | JSON Formatter & Minifier |
+| :---: | :---: |
+| ![REST Client & Testing (Bruno)](docs/assets/screenshots/02-rest-client-bruno.png) | ![JSON Formatter & Minifier](docs/assets/screenshots/01-json-formatter.png) |
+
+| JWT Token Inspector | YAML ↔ JSON Converter |
+| :---: | :---: |
+| ![JWT Token Inspector](docs/assets/screenshots/03-jwt-inspector.png) | ![YAML JSON Converter](docs/assets/screenshots/04-yaml-json-converter.png) |
+
+| JSON Schema Validator | Unix Chmod Permissions Calculator |
+| :---: | :---: |
+| ![JSON Schema Validator](docs/assets/screenshots/05-json-schema-validator.png) | ![Unix Chmod Calculator](docs/assets/screenshots/06-chmod-calculator.png) |
+
+| Regex Tester & Debugger | Text Diff & Comparison |
+| :---: | :---: |
+| ![Regex Tester](docs/assets/screenshots/07-regex-tester.png) | ![Text Diff Comparison](docs/assets/screenshots/08-text-diff.png) |
 
 ---
 

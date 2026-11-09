@@ -58,6 +58,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Detailed error reporting with character/line diagnostics for malformed inputs.
 * **Use Case**: Cleaning up minified REST API responses and preparing payload bodies for QA tests.
 
+![JSON Formatter & Minifier Screenshot](assets/screenshots/01-json-formatter.png)
+
 ### YAML ↔ JSON Converter
 * **Icon**: `📄`
 * **Purpose**: Bidirectional translation between YAML and JSON configuration files.
@@ -66,6 +68,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Generates clean, human-readable YAML from JSON objects.
   - Preserves types (booleans, integers, floats, strings, nulls).
 * **Use Case**: Editing Kubernetes manifests, GitHub Actions workflows, Docker Compose files, and OpenAPI specs.
+
+![YAML JSON Converter Screenshot](assets/screenshots/04-yaml-json-converter.png)
 
 ### JSON ↔ CSV Converter
 * **Icon**: `⇄`
@@ -104,6 +108,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Evaluates expiration timestamps and provides an active countdown timer.
   - Visual status alerts indicating whether a token is active, expired, or not yet valid.
 * **Use Case**: Debugging OAuth2 and OpenID Connect flows in development environments.
+
+![JWT Inspector Screenshot](assets/screenshots/03-jwt-inspector.png)
 
 ### Cryptographic Hashes & HMAC Generator
 * **Icon**: `#️⃣`
@@ -162,6 +168,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Copy reproducible `cURL` CLI commands.
 * **Use Case**: Testing local microservices, debugging REST endpoints, running automated QA assertion suites, and collaborating via Git-friendly `.bru` request files.
 
+![REST Client & Testing Screenshot](assets/screenshots/02-rest-client-bruno.png)
+
 ### JSON Schema Validator
 * **Icon**: `📋`
 * **Purpose**: Validates JSON payloads against draft JSON Schema specifications.
@@ -172,6 +180,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Includes a one-click sample loader.
 * **Use Case**: Verifying API contract compliance, validating schema migration scripts, and preventing breaking schema changes.
 
+![JSON Schema Validator Screenshot](assets/screenshots/05-json-schema-validator.png)
+
 ### Regex Tester & Pattern Debugger
 * **Icon**: `.*`
 * **Purpose**: Test regular expressions against text and log files.
@@ -181,6 +191,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Real-time syntax error validation.
 * **Use Case**: Verifying validation patterns for form inputs and parsing server log files.
 
+![Regex Tester Screenshot](assets/screenshots/07-regex-tester.png)
+
 ### Text Diff & Payload Comparator
 * **Icon**: `±`
 * **Purpose**: Compare two text documents or JSON responses.
@@ -188,6 +200,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Unified line-by-line comparison with green `+` additions and red `-` deletions.
   - Helps QA identify subtle discrepancies between expected and actual API responses.
 * **Use Case**: Regression testing API contracts and comparing configuration revisions.
+
+![Text Diff Screenshot](assets/screenshots/08-text-diff.png)
 
 ### UUID & GUID Batch Generator
 * **Icon**: `🎲`
@@ -226,6 +240,8 @@ Every utility runs **100% locally on your desktop machine**, ensuring sensitive 
   - Interactive permission matrix checkboxes for User, Group, and Others (Read: 4, Write: 2, Execute: 1).
   - Generates ready-to-use terminal command: `chmod <octal> <file>`.
 * **Use Case**: Setting execution rights on deployment shell scripts, securing private SSH keys (`600`), and configuring CI/CD runners.
+
+![Chmod Calculator Screenshot](assets/screenshots/06-chmod-calculator.png)
 
 ### .env ↔ JSON Environment Config
 * **Icon**: `⚙️`
